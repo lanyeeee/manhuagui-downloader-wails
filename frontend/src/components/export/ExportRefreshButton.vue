@@ -13,7 +13,6 @@ const notification = useNotification()
 const loading = ref<boolean>(false)
 const store = useDownloaderStore()
 
-// TODO: 第一次启动时，如果漫画缓存目录不存在，会导致扫描缓存目录失败
 watch(() => store.cacheDirectory, onRefresh)
 
 
