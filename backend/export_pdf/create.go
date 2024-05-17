@@ -40,9 +40,9 @@ func CreatePdfs(ctx context.Context, request CreatePdfsRequest) error {
 	go func() {
 		wg := sync.WaitGroup{}
 		sem := semaphore.NewWeighted(concurrentCount)
-		for _, task := range request.Tasks {
+		for i := range request.Tasks {
 			wg.Add(1)
-			go createPdf(ctx, &task, pdfResultCh, sem, &wg)
+			go createPdf(ctx, &request.Tasks[i], pdfResultCh, sem, &wg)
 		}
 		wg.Wait()
 		close(pdfResultCh)
