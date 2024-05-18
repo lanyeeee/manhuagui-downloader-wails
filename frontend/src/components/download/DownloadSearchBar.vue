@@ -53,7 +53,7 @@ async function onSearch() {
 
   try {
     loading.value = true
-    const response: types.Response = await SearchComicInfo(comicId, store.proxyUrl, store.cacheDirectory)
+    const response = await SearchComicInfo(comicId, store.proxyUrl, store.cacheDirectory)
     if (response.code != 0) {
       notification.create({type: "error", title: "搜索失败", meta: response.msg,})
       return
@@ -61,7 +61,7 @@ async function onSearch() {
 
     const root: types.TreeNode = response.data
     console.log("搜索结果", root)
-    const rootOption: TreeOption = buildOptionTree(root)
+    const rootOption = buildOptionTree(root)
 
     store.downloadTreeOptions = [rootOption]
 
