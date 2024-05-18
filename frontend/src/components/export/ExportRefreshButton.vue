@@ -43,7 +43,7 @@ async function onRefresh() {
   try {
     loading.value = true
 
-    const response: types.Response = await ScanCacheDir(store.cacheDirectory, store.exportDirectory, store.exportTreeMaxDepth)
+    const response = await ScanCacheDir(store.cacheDirectory, store.exportDirectory, store.exportTreeMaxDepth)
     if (response.code != 0) {
       notification.create({type: "error", title: "扫描缓存目录失败", content: response.msg})
       return
@@ -55,7 +55,7 @@ async function onRefresh() {
     store.exportDefaultCheckedKeys.length = 0
     store.exportDefaultExpandKeys.length = 0
     for (const root of roots) {
-      const rootOption: TreeOption = await buildOptionTree(root)
+      const rootOption = await buildOptionTree(root)
       exportTreeOptions.push(rootOption)
     }
 

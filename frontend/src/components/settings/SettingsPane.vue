@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import {onMounted, ref} from "vue"
 import {useNotification} from "naive-ui"
-import {types} from "../../../wailsjs/go/models"
 import {useDownloaderStore} from "../../stores/downloader"
 import {GetCpuNum} from "../../../wailsjs/go/api/UtilsApi"
 import {ChooseDirectory} from "../../../wailsjs/go/api/SettingsApi"
@@ -16,7 +15,7 @@ onMounted(async () => {
 })
 
 async function onChooseCacheDirectory() {
-  const response: types.Response = await ChooseDirectory(store.cacheDirectory)
+  const response = await ChooseDirectory(store.cacheDirectory)
   if (response.code != 0) {
     notification.create({type: "error", title: "选择缓存目录失败", meta: response.msg,})
   } else if (response.data !== "") {
@@ -26,7 +25,7 @@ async function onChooseCacheDirectory() {
 }
 
 async function onChooseExportDirectory() {
-  const response: types.Response = await ChooseDirectory(store.exportDirectory)
+  const response = await ChooseDirectory(store.exportDirectory)
   if (response.code != 0) {
     notification.create({type: "error", title: "选择导出目录失败", meta: response.msg,})
   } else if (response.data !== "") {
