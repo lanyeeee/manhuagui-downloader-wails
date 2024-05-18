@@ -4,6 +4,7 @@ import (
 	"context"
 	"manhuagui-downloader/backend/utils"
 	"os"
+	"path"
 	"path/filepath"
 )
 
@@ -45,7 +46,7 @@ func (p *PathApi) Join(args ...interface{}) string {
 	for _, param := range params {
 		ss = append(ss, param.(string))
 	}
-	return filepath.ToSlash(filepath.Join(ss...))
+	return filepath.ToSlash(path.Join(ss...))
 }
 
 func (p *PathApi) MkDirAll(path string) error {
@@ -58,7 +59,7 @@ func (p *PathApi) UserDownloadPath() (string, error) {
 		return "", err
 	}
 
-	downloadPath := filepath.Join(homeDir, "Downloads")
+	downloadPath := path.Join(homeDir, "Downloads")
 	downloadPath = filepath.ToSlash(downloadPath)
 
 	return downloadPath, nil

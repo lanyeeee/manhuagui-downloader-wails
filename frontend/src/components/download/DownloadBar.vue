@@ -62,9 +62,9 @@ async function downloadOptions(optionsToDownload: (TreeOption | null)[]) {
     option.prefix = () => h(NSpin, {size: 15})
     option.suffix = () => DownloadStatus.DOWNLOADING
 
-    const key = JSON.parse(option.key as string) as { href: string, saveDirectory: string }
+    const key = JSON.parse(option.key as string) as { href: string, saveDir: string }
     const chapterUrl = "https://www.manhuagui.com" + key.href
-    const saveDirectory = key.saveDirectory
+    const saveDirectory = key.saveDir
     const concurrentCount = store.downloadConcurrentCount
     const proxyUrl = store.proxyUrl
     EventsOn("download", (msg: string, percentage: number) => {

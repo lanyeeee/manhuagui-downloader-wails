@@ -6,6 +6,7 @@ import (
 	"github.com/pdfcpu/pdfcpu/pkg/api"
 	"manhuagui-downloader/backend/utils"
 	"os"
+	"path"
 	"path/filepath"
 	"sort"
 )
@@ -23,7 +24,7 @@ func MergePdfs(pdfDir string, outputPath string) error {
 	// 从 PDF 文件列表中提取 PDF 文件路径
 	pdfPaths := make([]string, len(pdfEntries))
 	for i, entry := range pdfEntries {
-		pdfPaths[i] = filepath.Join(pdfDir, entry.Name())
+		pdfPaths[i] = path.Join(pdfDir, entry.Name())
 	}
 	// 合并 PDF 文件
 	if err = api.MergeCreateFile(pdfPaths, outputPath, false, nil); err != nil {

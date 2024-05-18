@@ -1,12 +1,17 @@
 package search
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"io"
 	"manhuagui-downloader/backend/http_client"
+	"manhuagui-downloader/backend/types"
+	"manhuagui-downloader/backend/utils"
 	"net/http"
+	"path"
+	"path/filepath"
 	"slices"
 	"strings"
 )
@@ -17,11 +22,11 @@ type ComicInfo struct {
 }
 
 type ChapterType struct {
-	Title         string         `json:"title"`
-	ChapterPagers []ChapterPager `json:"chapterPagers"`
+	Title        string        `json:"title"`
+	ChapterPages []ChapterPage `json:"chapterPages"`
 }
 
-type ChapterPager struct {
+type ChapterPage struct {
 	Title    string    `json:"title"`
 	Chapters []Chapter `json:"chapters"`
 }
@@ -31,124 +36,174 @@ type Chapter struct {
 	Href  string `json:"href"`
 }
 
-func Info(comicId string) (ComicInfo, error) {
+type ChapterTreeNodeKey struct {
+	Href    string `json:"href"`
+	SaveDir string `json:"saveDir"`
+}
+
+func Info(comicId string, cacheDir string) (types.TreeNode, error) {
 	resp, err := http_client.HttpClientInst().Get("https://www.manhuagui.com/comic/" + comicId)
 	if err != nil {
-		return ComicInfo{}, fmt.Errorf("do request failed: %w", err)
+		return types.TreeNode{}, fmt.Errorf("do request failed: %w", err)
 	}
 	defer func(Body io.ReadCloser) { _ = Body.Close() }(resp.Body)
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return ComicInfo{}, fmt.Errorf("read response body failed: %w", err)
+		return types.TreeNode{}, fmt.Errorf("read response body failed: %w", err)
 	}
-
 	// 处理HTTP错误
 	switch resp.StatusCode {
 	case http.StatusOK:
 		// ignore
 	case http.StatusNotFound:
-		return ComicInfo{}, errors.New(fmt.Sprintf("can't find comic with id: %s", comicId))
+		return types.TreeNode{}, errors.New(fmt.Sprintf("can't find comic with id: %s", comicId))
 	default:
-		return ComicInfo{}, errors.New(fmt.Sprintf("unexpected status code: %d", resp.StatusCode))
+		return types.TreeNode{}, errors.New(fmt.Sprintf("unexpected status code: %d", resp.StatusCode))
 	}
 
 	htmlContent := string(respBody)
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlContent))
 	if err != nil {
-		return ComicInfo{}, fmt.Errorf("parse html failed: %w", err)
+		return types.TreeNode{}, fmt.Errorf("parse html failed: %w", err)
 	}
 
 	title, err := getTitle(doc)
 	if err != nil {
-		return ComicInfo{}, fmt.Errorf("get title failed: %w", err)
+		return types.TreeNode{}, fmt.Errorf("get title failed: %w", err)
 	}
 
 	chapterTypes, err := getChapterTypes(doc)
 	if err != nil {
-		return ComicInfo{}, fmt.Errorf("get chapter types failed: %w", err)
+		return types.TreeNode{}, fmt.Errorf("get chapter types failed: %w", err)
 	}
 
 	comicInfo := ComicInfo{
 		Title:        title,
 		ChapterTypes: chapterTypes,
 	}
-
-	return comicInfo, nil
-}
-
-func getChapterTypes(doc *goquery.Document) ([]ChapterType, error) {
-	// chapterDiv是包含章节信息的div
-	chapterDiv := doc.Find("div[class~=chapter]")
-	var chapterTypes []ChapterType
-
-	completeChapterTypeTitles(&chapterTypes, chapterDiv)
-	completeChapterTypeChapterPagers(&chapterTypes, chapterDiv)
-
-	return chapterTypes, nil
-}
-
-func completeChapterTypeTitles(chapterTypes *[]ChapterType, chapterDiv *goquery.Selection) {
-	chapterDiv.Find("h4").Each(func(i int, h4 *goquery.Selection) {
-		chapterTypeTitle := h4.Find("span").Text()
-		if chapterTypeTitle != "" {
-			*chapterTypes = append(*chapterTypes, ChapterType{Title: chapterTypeTitle})
-		}
-	})
-}
-
-func completeChapterTypeChapterPagers(chapterTypes *[]ChapterType, chapterDiv *goquery.Selection) {
-	completeChapterPagerTitles(chapterTypes, chapterDiv)
-	completeChapterPagerChapters(chapterTypes, chapterDiv)
-}
-
-func completeChapterPagerTitles(chapterTypes *[]ChapterType, chapterDiv *goquery.Selection) {
-	chapterDiv.Find("div[class~=chapter-page]").Each(func(chapterTypeIndex int, div *goquery.Selection) {
-		// 这个div的内容是该章节类型的分页信息，div中含有多个a标签，每个a标签对应一个分页
-		div.Find("a").Each(func(_ int, a *goquery.Selection) {
-			chapterPagerTitle, exist := a.Attr("title")
-			if exist {
-				chapterType := &(*chapterTypes)[chapterTypeIndex]
-				chapterPager := ChapterPager{Title: chapterPagerTitle}
-				chapterType.ChapterPagers = append(chapterType.ChapterPagers, chapterPager)
-			}
-		})
-	})
-	// 如果章节类型没有分页信息，则添加一个默认的分页
-	for i := range *chapterTypes {
-		chapterType := &(*chapterTypes)[i]
-		if chapterType.ChapterPagers == nil {
-			chapterType.ChapterPagers = []ChapterPager{{Title: "全部"}}
-		}
+	// 构建树
+	root, err := buildTree(&comicInfo, cacheDir)
+	if err != nil {
+		return types.TreeNode{}, fmt.Errorf("build tree failed: %w", err)
 	}
-}
 
-func completeChapterPagerChapters(chapterTypes *[]ChapterType, chapterDiv *goquery.Selection) {
-	chapterDiv.Find("div[class~=chapter-list]").Each(func(chapterTypeIndex int, div *goquery.Selection) {
-		chapterType := &(*chapterTypes)[chapterTypeIndex]
-		// 这个div的内容是该张杰类型的章节信息，div中含有多个ul，每个ul对应一个分页
-		div.Find("ul").Each(func(chapterPagerIndex int, ul *goquery.Selection) {
-			chapterPager := &chapterType.ChapterPagers[chapterPagerIndex]
-			// 每个ul中含有多个a标签，每个a标签对应一个章节
-			ul.Find("a").Each(func(_ int, a *goquery.Selection) {
-				href, exist := a.Attr("href")
-				if !exist {
-					return
-				}
-
-				title, exist := a.Attr("title")
-				if !exist {
-					return
-				}
-
-				chapter := Chapter{Title: title, Href: href}
-				chapterPager.Chapters = append(chapterPager.Chapters, chapter)
-			})
-			slices.Reverse(chapterPager.Chapters)
-		})
-	})
+	return root, nil
 }
 
 func getTitle(doc *goquery.Document) (string, error) {
 	title := doc.Find("h1").Text()
 	return title, nil
+}
+
+func getChapterTypes(doc *goquery.Document) ([]ChapterType, error) {
+	var chapterTypes []ChapterType
+	chapterDiv := doc.Find("div[class~=chapter]")
+
+	chapterDiv.Find("h4").Each(func(i int, h4 *goquery.Selection) {
+		chapterType := ChapterType{Title: h4.Find("span").Text()}
+
+		// class中包含chapter-page的div表示这个章节类型有分页
+		if h4.Next().Is("div[class~=chapter-page]") {
+			chapterPageDiv := h4.Next()
+			chapterPageDiv.Find("a").Each(func(_ int, a *goquery.Selection) {
+				title, exist := a.Attr("title")
+				if exist {
+					chapterType.ChapterPages = append(chapterType.ChapterPages, ChapterPage{Title: title})
+				}
+			})
+
+			chapterListDiv := chapterPageDiv.Next()
+			chapterListDiv.Find("ul").Each(func(pageIndex int, ul *goquery.Selection) {
+				// 每个ul表示一个分页
+				chapterType.ChapterPages[pageIndex].Chapters = getChaptersFromUl(ul)
+			})
+
+		} else { // 这个章节类型没有分页
+			chapterListDiv := h4.Next()
+			ul := chapterListDiv.Find("ul").First()
+			chapters := getChaptersFromUl(ul)
+			page := ChapterPage{Chapters: chapters}
+			chapterType.ChapterPages = []ChapterPage{page}
+		}
+
+		chapterTypes = append(chapterTypes, chapterType)
+	})
+
+	return chapterTypes, nil
+}
+
+func getChaptersFromUl(ul *goquery.Selection) []Chapter {
+	var chapters []Chapter
+
+	ul.Find("a").Each(func(_ int, a *goquery.Selection) {
+		href, hrefExist := a.Attr("href")
+		title, titleExist := a.Attr("title")
+		if hrefExist && titleExist {
+			chapter := Chapter{Title: title, Href: href}
+			chapters = append(chapters, chapter)
+		}
+	})
+
+	slices.Reverse(chapters)
+	return chapters
+}
+
+func buildTree(comicInfo *ComicInfo, cacheDir string) (types.TreeNode, error) {
+	root := types.TreeNode{
+		Label:         comicInfo.Title,
+		Key:           filepath.ToSlash(path.Join(cacheDir, comicInfo.Title)),
+		Children:      []types.TreeNode{},
+		DefaultExpand: true,
+	}
+
+	for _, chapterType := range comicInfo.ChapterTypes {
+		chapterTypeNode := types.TreeNode{
+			Label:         chapterType.Title,
+			Key:           filepath.ToSlash(path.Join(root.Key, chapterType.Title)),
+			Children:      []types.TreeNode{},
+			DefaultExpand: true,
+		}
+
+		for _, chapterPage := range chapterType.ChapterPages {
+			chapterPageNode := types.TreeNode{
+				Label:    chapterPage.Title,
+				Key:      filepath.ToSlash(path.Join(chapterTypeNode.Key, chapterPage.Title)),
+				Children: []types.TreeNode{},
+			}
+
+			for _, chapter := range chapterPage.Chapters {
+				saveDir := filepath.ToSlash(path.Join(chapterPageNode.Key, chapter.Title))
+				saveDirExists := utils.PathExists(saveDir)
+				keyJsonBytes, err := json.Marshal(ChapterTreeNodeKey{
+					Href:    chapter.Href,
+					SaveDir: saveDir,
+				})
+				if err != nil {
+					return types.TreeNode{}, fmt.Errorf("marshal key failed: %w", err)
+				}
+
+				chapterNode := types.TreeNode{
+					Label:          chapter.Title,
+					Key:            string(keyJsonBytes),
+					IsLeaf:         true,
+					Disabled:       saveDirExists,
+					Children:       []types.TreeNode{},
+					DefaultChecked: saveDirExists,
+				}
+				chapterPageNode.Children = append(chapterPageNode.Children, chapterNode)
+			}
+
+			chapterTypeNode.Children = append(chapterTypeNode.Children, chapterPageNode)
+		}
+
+		// 如果只有一个分页，就不要显示分页了，直接显示章节
+		if len(chapterTypeNode.Children) == 1 {
+			page := chapterTypeNode.Children[0]
+			chapterTypeNode.Children = page.Children
+		}
+
+		root.Children = append(root.Children, chapterTypeNode)
+	}
+
+	return root, nil
 }

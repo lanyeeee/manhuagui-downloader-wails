@@ -2,6 +2,7 @@ package scan_cache
 
 import (
 	"fmt"
+	"manhuagui-downloader/backend/types"
 	"manhuagui-downloader/backend/utils"
 	"os"
 	"path"
@@ -10,32 +11,25 @@ import (
 	"strings"
 )
 
-type TreeNode struct {
-	Label    string     `json:"label"`
-	Key      string     `json:"key"`
-	Children []TreeNode `json:"children"`
-	IsLeaf   bool       `json:"isLeaf"`
-}
-
-func ScanCacheDir(cacheDir string, maxDepth int64) ([]TreeNode, error) {
+func ScanCacheDir(cacheDir string, maxDepth int64) ([]types.TreeNode, error) {
 	// 将路径中的反斜杠转换为正斜杠
 	cacheDir = filepath.ToSlash(cacheDir)
 
-	root := TreeNode{
+	root := types.TreeNode{
 		Label:    path.Base(cacheDir),
 		Key:      cacheDir,
-		Children: []TreeNode{},
+		Children: []types.TreeNode{},
 	}
 
 	err := buildTree(&root, 0, maxDepth)
 	if err != nil {
-		return []TreeNode{}, fmt.Errorf("build tree failed: %w", err)
+		return []types.TreeNode{}, fmt.Errorf("build tree failed: %w", err)
 	}
 
 	return root.Children, nil
 }
 
-func buildTree(node *TreeNode, depth int64, maxDeep int64) error {
+func buildTree(node *types.TreeNode, depth int64, maxDeep int64) error {
 	defer func() { node.IsLeaf = isLeafNode(node) }()
 
 	if depth > maxDeep {
@@ -57,10 +51,10 @@ func buildTree(node *TreeNode, depth int64, maxDeep int64) error {
 		}
 
 		childPath := path.Join(node.Key, entry.Name())
-		childNode := TreeNode{
+		childNode := types.TreeNode{
 			Label:    entry.Name(),
 			Key:      childPath,
-			Children: []TreeNode{},
+			Children: []types.TreeNode{},
 		}
 		err = buildTree(&childNode, depth+1, maxDeep)
 		if err != nil {
@@ -73,7 +67,7 @@ func buildTree(node *TreeNode, depth int64, maxDeep int64) error {
 	return nil
 }
 
-func isLeafNode(node *TreeNode) bool {
+func isLeafNode(node *types.TreeNode) bool {
 	// 如果无法读取目录，则认为是叶子节点
 	entries, err := os.ReadDir(node.Key)
 	if err != nil {
