@@ -12,10 +12,10 @@ watch(treeRef, () => {
 })
 
 const treeNodeClickBehaviour: TreeOverrideNodeClickBehavior = ({option}) => {
-  if (option.children) {
-    return "toggleExpand"
+  if (option.children?.length === 0) {
+    return "toggleCheck"
   }
-  return "toggleCheck"
+  return "toggleExpand"
 }
 
 </script>

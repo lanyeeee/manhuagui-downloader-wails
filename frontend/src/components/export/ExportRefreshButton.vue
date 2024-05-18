@@ -5,7 +5,6 @@ import {useDownloaderStore} from "../../stores/downloader";
 import {types} from "../../../wailsjs/go/models";
 import {ScanCacheDir} from "../../../wailsjs/go/api/ExportApi";
 import {TreeOption, useNotification} from "naive-ui";
-import * as path from "../../../wailsjs/go/api/PathApi";
 import {ExportStatus} from "../../constants/export-constant";
 
 const notification = useNotification()
@@ -16,22 +15,25 @@ const store = useDownloaderStore()
 watch(() => store.cacheDirectory, onRefresh)
 
 
-async function buildOptionTree(node: types.TreeNode): Promise<TreeOption> {
-  const nodeOption: TreeOption = {key: node.key, label: node.label, isLeaf: node.isLeaf,}
-  const relativePath: string = await path.GetRelPath(store.cacheDirectory, node.key)
-  const pdfPath: string = await path.Join([store.exportDirectory, relativePath + ".pdf"])
-  if (await path.PathExists(pdfPath)) {
-    nodeOption.suffix = () => ExportStatus.COMPLETED
-    if (node.isLeaf) {
-      nodeOption.disabled = true
-      store.exportDefaultCheckedKeys.push(node.key)
-    }
+async function buildOptionTree(node: types.TreeNode) {
+  const nodeOption: TreeOption = {
+    key: node.key,
+    label: node.label,
+    isLeaf: node.isLeaf,
+    disabled: node.disabled,
+    children: []
+  }
+  if (node.defaultChecked) {
+    store.exportDefaultCheckedKeys.push(node.key)
+    nodeOption.suffix = ()=> ExportStatus.COMPLETED
+  }
+  if (node.defaultExpand) {
+    store.exportDefaultExpandKeys.push(node.key)
   }
 
   for (const child of node.children) {
-    nodeOption.children ??= []
     const childOption = await buildOptionTree(child)
-    nodeOption.children.push(childOption);
+    nodeOption.children?.push(childOption);
   }
 
   return nodeOption
@@ -41,26 +43,23 @@ async function onRefresh() {
   try {
     loading.value = true
 
-    const response: types.Response = await ScanCacheDir(store.cacheDirectory, store.exportTreeMaxDepth)
+    const response: types.Response = await ScanCacheDir(store.cacheDirectory, store.exportDirectory, store.exportTreeMaxDepth)
     if (response.code != 0) {
       notification.create({type: "error", title: "扫描缓存目录失败", content: response.msg})
       return
     }
 
     const roots: types.TreeNode[] = response.data
-    console.log(roots)
     // 清空原有的数据
-    store.exportTreeOptions.length = 0
+    const exportTreeOptions: TreeOption[] = []
+    store.exportDefaultCheckedKeys.length = 0
     store.exportDefaultExpandKeys.length = 0
     for (const root of roots) {
       const rootOption: TreeOption = await buildOptionTree(root)
-      store.exportTreeOptions.push(rootOption)
-      // 设置默认展开的节点
-      store.exportDefaultExpandKeys.push(rootOption.key as string)
-      rootOption.children?.forEach(child => {
-        store.exportDefaultExpandKeys.push(child.key as string)
-      })
+      exportTreeOptions.push(rootOption)
     }
+
+    store.exportTreeOptions = exportTreeOptions
   } catch (e) {
     console.error(e)
     if (typeof e === "string") {

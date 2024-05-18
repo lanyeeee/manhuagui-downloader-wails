@@ -11,27 +11,22 @@ import (
 	"strings"
 )
 
-func ScanCacheDir(cacheDir string, maxDepth int64) ([]types.TreeNode, error) {
+func ScanCacheDir(cacheDir string, exportDir string, maxDepth int64) ([]types.TreeNode, error) {
 	// 将路径中的反斜杠转换为正斜杠
 	cacheDir = filepath.ToSlash(cacheDir)
 
 	root := types.TreeNode{
-		Label:    path.Base(cacheDir),
 		Key:      cacheDir,
 		Children: []types.TreeNode{},
 	}
-
-	err := buildTree(&root, 0, maxDepth)
-	if err != nil {
+	if err := buildTree(&root, cacheDir, exportDir, 0, maxDepth); err != nil {
 		return []types.TreeNode{}, fmt.Errorf("build tree failed: %w", err)
 	}
 
 	return root.Children, nil
 }
 
-func buildTree(node *types.TreeNode, depth int64, maxDeep int64) error {
-	defer func() { node.IsLeaf = isLeafNode(node) }()
-
+func buildTree(node *types.TreeNode, cacheDir string, exportDir string, depth int64, maxDeep int64) error {
 	if depth > maxDeep {
 		return nil
 	}
@@ -50,14 +45,29 @@ func buildTree(node *types.TreeNode, depth int64, maxDeep int64) error {
 			continue
 		}
 
-		childPath := path.Join(node.Key, entry.Name())
-		childNode := types.TreeNode{
-			Label:    entry.Name(),
-			Key:      childPath,
-			Children: []types.TreeNode{},
+		key := path.Join(node.Key, entry.Name())
+		isLeaf := isLeafNode(key)
+		exported := isExported(key, cacheDir, exportDir)
+		disabled := false
+		if isLeaf { // 只有叶子节点才能disable
+			disabled = exported
 		}
-		err = buildTree(&childNode, depth+1, maxDeep)
-		if err != nil {
+		defaultExpand := false
+		if depth < 1 { // 默认展开第一层
+			defaultExpand = true
+		}
+
+		childNode := types.TreeNode{
+			Label:          entry.Name(),
+			Key:            key,
+			Children:       []types.TreeNode{},
+			DefaultExpand:  defaultExpand,
+			IsLeaf:         isLeaf,
+			DefaultChecked: exported,
+			Disabled:       disabled,
+		}
+		//fmt.Printf("childNode: %v\n", childNode)
+		if err = buildTree(&childNode, cacheDir, exportDir, depth+1, maxDeep); err != nil {
 			return fmt.Errorf("build tree failed: %w", err)
 		}
 
@@ -67,9 +77,9 @@ func buildTree(node *types.TreeNode, depth int64, maxDeep int64) error {
 	return nil
 }
 
-func isLeafNode(node *types.TreeNode) bool {
+func isLeafNode(key string) bool {
 	// 如果无法读取目录，则认为是叶子节点
-	entries, err := os.ReadDir(node.Key)
+	entries, err := os.ReadDir(key)
 	if err != nil {
 		return true
 	}
@@ -82,4 +92,14 @@ func isLeafNode(node *types.TreeNode) bool {
 	}
 
 	return true
+}
+
+func isExported(key string, cacheDir string, exportDir string) bool {
+	relPath, err := filepath.Rel(cacheDir, key)
+	if err != nil {
+		return false
+	}
+	pdfPath := path.Join(exportDir, relPath+".pdf")
+
+	return utils.PathExists(pdfPath)
 }

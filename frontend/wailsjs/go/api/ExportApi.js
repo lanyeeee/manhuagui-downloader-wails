@@ -10,8 +10,8 @@ export function MergePdfs(arg1, arg2) {
   return window['go']['api']['ExportApi']['MergePdfs'](arg1, arg2);
 }
 
-export function ScanCacheDir(arg1, arg2) {
-  return window['go']['api']['ExportApi']['ScanCacheDir'](arg1, arg2);
+export function ScanCacheDir(arg1, arg2, arg3) {
+  return window['go']['api']['ExportApi']['ScanCacheDir'](arg1, arg2, arg3);
 }
 
 export function Startup(arg1) {
