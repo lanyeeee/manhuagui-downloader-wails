@@ -14,7 +14,7 @@ const searchInput = ref<string>("")
 const loading = ref<boolean>(false)
 const disabled = computed<boolean>(() => store.searchDisabled)
 
-async function buildOptionTree(node: types.TreeNode): Promise<TreeOption> {
+function buildOptionTree(node: types.TreeNode): TreeOption {
   const nodeOption: TreeOption = {key: node.key, label: node.label, isLeaf: node.isLeaf, disabled: node.disabled}
 
   if (node.defaultChecked) {
@@ -26,7 +26,7 @@ async function buildOptionTree(node: types.TreeNode): Promise<TreeOption> {
 
   for (const child of node.children) {
     nodeOption.children ??= []
-    const childOption = await buildOptionTree(child)
+    const childOption = buildOptionTree(child)
     nodeOption.children.push(childOption);
   }
 
@@ -54,7 +54,7 @@ async function onSearch() {
 
     const root: types.TreeNode = response.data
     console.log("搜索结果", root)
-    const rootOption: TreeOption = await buildOptionTree(root)
+    const rootOption: TreeOption = buildOptionTree(root)
 
     store.downloadTreeOptions = [rootOption]
 
