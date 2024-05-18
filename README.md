@@ -1,19 +1,59 @@
-# README
+# manhuagui-downloader 漫画柜下载器
 
-## About
+一个用于 manhuagui.com 看漫画 漫画柜 的下载器
 
-This is the official Wails Vue-TS template.
+在[Release页面](https://github.com/lanyeeee/manhuagui-downloader/releases)可以直接下载，带图形界面，支持导出PDF，免安装版(portable)解压后可以直接运行，**建议下载安装版，免安装版容易被杀毒软件误判为病毒**
 
-You can configure the project by editing `wails.json`. More information about the project settings can be found
-here: https://wails.io/docs/reference/project-config
+# 图形界面
 
-## Live Development
+### 下载
 
-To run in live development mode, run `wails dev` in the project directory. This will run a Vite development
-server that will provide very fast hot reload of your frontend changes. If you want to develop in a browser
-and have access to your Go methods, there is also a dev server that runs on http://localhost:34115. Connect
-to this in your browser, and you can call your Go code from devtools.
+默认下载目录为 `C:/Users/[你的用户名]/Downloads/漫画缓存`
 
-## Building
+![download.gif](md/download.gif)
 
-To build a redistributable, production mode package, use `wails build`.
+### 导出
+
+默认导出目录为`C:/Users/[你的用户名]/Downloads/漫画导出`
+
+![download.gif](md/export.gif)
+
+### 注意
+
+中国大陆访问 [漫画柜](https://www.manhuagui.com) 是需要代理的，默认的代理为`http://127.0.0.1:7890`，即clash默认的代理地址
+
+如果需要修改可以点击右侧的箭头打开参数设置自行修改，清空则不使用代理
+
+![image-20240519005528352](md/settings.png)
+
+# 如何构建(build)
+
+如果你是普通用户请忽略这部分内容
+
+### 前提
+
+- [Go 1.18+](https://go.dev/dl/)
+- [NPM (Node 15+)](https://nodejs.org/en)
+
+### 安装Wails
+
+```
+go install github.com/wailsapp/wails/v2/cmd/wails@latest
+```
+
+### 克隆本仓库
+
+```
+git clone https://github.com/lanyeeee/manhuagui-downloader.git
+```
+
+### 构建(build)
+
+```
+cd manhuagui-downloader
+wails build
+```
+
+# License 许可证
+
+[MIT](LICENSE)
