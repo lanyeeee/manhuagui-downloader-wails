@@ -25,8 +25,8 @@ onMounted(() => {
 })
 
 async function onDownload() {
-  // 满足不为null，没有children，没有disabled的才是要下载的章节
-  const optionsToDownload = store.checkedDownloadTreeOptions?.filter(option => option !== null && !option.children && !option.disabled)
+  // 满足不为null，是叶子节点，没有disabled的才是要下载的章节
+  const optionsToDownload = store.checkedDownloadTreeOptions?.filter(option => option !== null && option.isLeaf && !option.disabled)
   if (optionsToDownload === undefined || optionsToDownload.length === 0) {
     notification.create({type: "error", title: "下载失败", content: "请选择要下载的章节", duration: 2000,})
     return

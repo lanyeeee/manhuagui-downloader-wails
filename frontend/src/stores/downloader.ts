@@ -38,17 +38,16 @@ export const useDownloaderStore = defineStore('downloader', {
         async init() {
             try {
                 const userDownloadPath = await path.UserDownloadPath()
-                const cacheDirectory = await path.Join([userDownloadPath, "漫画缓存"])
-                if (!await path.PathExists(cacheDirectory)) {
-                    await path.MkDirAll(cacheDirectory)
-                }
-                this.cacheDirectory = await path.Join([userDownloadPath, "漫画缓存"])
-
                 const exportDirectory = await path.Join([userDownloadPath, "漫画导出"])
                 if (!await path.PathExists(exportDirectory)) {
                     await path.MkDirAll(exportDirectory)
                 }
+                const cacheDirectory = await path.Join([userDownloadPath, "漫画缓存"])
+                if (!await path.PathExists(cacheDirectory)) {
+                    await path.MkDirAll(cacheDirectory)
+                }
                 this.exportDirectory = await path.Join([userDownloadPath, "漫画导出"])
+                this.cacheDirectory = await path.Join([userDownloadPath, "漫画缓存"])
 
                 this.exportConcurrentCount = await GetCpuNum() / 2
             } catch (e) {

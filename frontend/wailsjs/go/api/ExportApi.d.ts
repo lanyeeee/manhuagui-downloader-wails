@@ -8,7 +8,7 @@ export function CreatePdfs(arg1:export_pdf.CreatePdfsRequest):Promise<types.Resp
 
 export function MergePdfs(arg1:string,arg2:string):Promise<types.Response>;
 
-export function ScanCacheDir(arg1:string,arg2:number):Promise<types.Response>;
+export function ScanCacheDir(arg1:string,arg2:string,arg3:number):Promise<types.Response>;
 
 export function Startup(arg1:context.Context):Promise<void>;
 

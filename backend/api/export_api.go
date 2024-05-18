@@ -19,9 +19,9 @@ func (e *ExportApi) Startup(ctx context.Context) {
 	e.ctx = ctx
 }
 
-func (e *ExportApi) ScanCacheDir(cacheDir string, maxDepth int64) types.Response {
+func (e *ExportApi) ScanCacheDir(cacheDir string, exportDir string, maxDepth int64) types.Response {
 	resp := types.Response{}
-	treeOption, err := scan_cache.ScanCacheDir(cacheDir, maxDepth)
+	treeOption, err := scan_cache.ScanCacheDir(cacheDir, exportDir, maxDepth)
 	if err != nil {
 		resp.Code = -1
 		resp.Msg = err.Error()

@@ -5,6 +5,7 @@ import {useDownloaderStore} from "../../stores/downloader"
 import {SearchOutline as SearchIcon} from "@vicons/ionicons5"
 import {SearchComicInfo} from "../../../wailsjs/go/api/DownloadApi"
 import {types} from "../../../wailsjs/go/models"
+import {DownloadStatus} from "../../constants/download-constant";
 
 
 const store = useDownloaderStore()
@@ -15,19 +16,25 @@ const loading = ref<boolean>(false)
 const disabled = computed<boolean>(() => store.searchDisabled)
 
 function buildOptionTree(node: types.TreeNode): TreeOption {
-  const nodeOption: TreeOption = {key: node.key, label: node.label, isLeaf: node.isLeaf, disabled: node.disabled}
+  const nodeOption: TreeOption = {
+    key: node.key,
+    label: node.label,
+    isLeaf: node.isLeaf,
+    disabled: node.disabled,
+    children: []
+  }
 
   if (node.defaultChecked) {
     store.downloadDefaultCheckedKeys.push(node.key)
+    nodeOption.suffix = () => DownloadStatus.COMPLETED
   }
   if (node.defaultExpand) {
     store.downloadDefaultExpandKeys.push(node.key)
   }
 
   for (const child of node.children) {
-    nodeOption.children ??= []
     const childOption = buildOptionTree(child)
-    nodeOption.children.push(childOption);
+    nodeOption.children?.push(childOption);
   }
 
   return nodeOption
