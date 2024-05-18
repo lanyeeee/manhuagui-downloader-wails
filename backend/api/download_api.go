@@ -20,7 +20,7 @@ func (d *DownloadApi) Startup(ctx context.Context) {
 	d.ctx = ctx
 }
 
-func (d *DownloadApi) SearchComicInfo(comicId string, proxyUrl string) types.Response {
+func (d *DownloadApi) SearchComicInfo(comicId string, proxyUrl string, cacheDir string) types.Response {
 	resp := types.Response{}
 	err := http_client.UpdateProxy(proxyUrl)
 	if err != nil {
@@ -29,7 +29,7 @@ func (d *DownloadApi) SearchComicInfo(comicId string, proxyUrl string) types.Res
 		return types.Response{}
 	}
 
-	comicInfo, err := search.Info(comicId)
+	comicInfo, err := search.Info(comicId, cacheDir)
 	if err != nil {
 		resp.Code = -1
 		resp.Msg = err.Error()

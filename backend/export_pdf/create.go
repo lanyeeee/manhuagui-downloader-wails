@@ -52,6 +52,7 @@ func CreatePdfs(ctx context.Context, request CreatePdfsRequest) error {
 	completedTaskCount := 0              // 已经成功创建的 PDF 数量
 	for result := range pdfResultCh {
 		// 某个任务创建 PDF 失败
+		// TODO: 应该处理完所有任务后才返回错误
 		if result.err != nil {
 			return fmt.Errorf("create pdf failed: %w", result.err)
 		}
@@ -85,7 +86,7 @@ func createPdf(ctx context.Context, task *CreatePdfTask, pdfResultCh chan<- crea
 	// 从文件列表中获取图片文件路径
 	imgPaths := make([]string, len(imgEntries))
 	for i, entry := range imgEntries {
-		imgPaths[i] = filepath.Join(task.ImgDir, entry.Name())
+		imgPaths[i] = path.Join(task.ImgDir, entry.Name())
 	}
 
 	if err = sem.Acquire(ctx, 1); err != nil {

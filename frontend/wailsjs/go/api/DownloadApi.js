@@ -10,8 +10,8 @@ export function DownloadChapter(arg1, arg2, arg3, arg4) {
   return window['go']['api']['DownloadApi']['DownloadChapter'](arg1, arg2, arg3, arg4);
 }
 
-export function SearchComicInfo(arg1, arg2) {
-  return window['go']['api']['DownloadApi']['SearchComicInfo'](arg1, arg2);
+export function SearchComicInfo(arg1, arg2, arg3) {
+  return window['go']['api']['DownloadApi']['SearchComicInfo'](arg1, arg2, arg3);
 }
 
 export function Startup(arg1) {

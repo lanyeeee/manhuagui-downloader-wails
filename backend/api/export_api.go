@@ -56,6 +56,6 @@ func (e *ExportApi) MergePdfs(pdfDir string, outputPath string) types.Response {
 	return resp
 }
 
-func (e *ExportApi) TreeOptionModel() scan_cache.TreeNode {
-	return scan_cache.TreeNode{}
+func (e *ExportApi) TreeOptionModel() types.TreeNode {
+	return types.TreeNode{}
 }

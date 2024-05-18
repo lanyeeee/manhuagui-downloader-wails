@@ -3,10 +3,8 @@ import {computed, ref} from "vue"
 import {TreeOption, useNotification} from "naive-ui"
 import {useDownloaderStore} from "../../stores/downloader"
 import {SearchOutline as SearchIcon} from "@vicons/ionicons5"
-import {DownloadStatus} from "../../constants/download-constant"
-import * as path from "../../../wailsjs/go/api/PathApi"
 import {SearchComicInfo} from "../../../wailsjs/go/api/DownloadApi"
-import {search, types} from "../../../wailsjs/go/models"
+import {types} from "../../../wailsjs/go/models"
 
 
 const store = useDownloaderStore()
@@ -15,6 +13,25 @@ const notification = useNotification()
 const searchInput = ref<string>("")
 const loading = ref<boolean>(false)
 const disabled = computed<boolean>(() => store.searchDisabled)
+
+async function buildOptionTree(node: types.TreeNode): Promise<TreeOption> {
+  const nodeOption: TreeOption = {key: node.key, label: node.label, isLeaf: node.isLeaf, disabled: node.disabled}
+
+  if (node.defaultChecked) {
+    store.downloadDefaultCheckedKeys.push(node.key)
+  }
+  if (node.defaultExpand) {
+    store.downloadDefaultExpandKeys.push(node.key)
+  }
+
+  for (const child of node.children) {
+    nodeOption.children ??= []
+    const childOption = await buildOptionTree(child)
+    nodeOption.children.push(childOption);
+  }
+
+  return nodeOption
+}
 
 async function onSearch() {
   if (loading.value || disabled.value) {
@@ -29,85 +46,21 @@ async function onSearch() {
 
   try {
     loading.value = true
-    const response: types.Response = await SearchComicInfo(comicId, store.proxyUrl)
+    const response: types.Response = await SearchComicInfo(comicId, store.proxyUrl, store.cacheDirectory)
     if (response.code != 0) {
       notification.create({type: "error", title: "搜索失败", meta: response.msg,})
       return
     }
 
-    const comicInfo: search.ComicInfo = response.data as search.ComicInfo
+    const root: types.TreeNode = response.data
+    console.log("搜索结果", root)
+    const rootOption: TreeOption = await buildOptionTree(root)
 
-    console.log("搜索结果", comicInfo)
+    store.downloadTreeOptions = [rootOption]
 
-    await handleSearchResult(comicInfo)
   } finally {
     loading.value = false
   }
-}
-
-async function handleSearchResult(comicInfo: search.ComicInfo) {
-  const defaultExpandedKeys: string[] = []
-  const defaultCheckedKeys: string[] = []
-
-  const comicTreeOption: TreeOption = {
-    label: comicInfo.title,
-    key: comicInfo.title,
-    children: [],
-    isLeaf: false
-  }
-  defaultExpandedKeys.push(comicTreeOption.key as string)
-
-  for (const chapterType of comicInfo.chapterTypes) {
-    const chapterTypeTreeOption: TreeOption = {
-      label: chapterType.title,
-      key: await path.Join([comicInfo.title, chapterType.title]),
-      children: [],
-      isLeaf: false
-    }
-    defaultExpandedKeys.push(chapterTypeTreeOption.key as string)
-
-
-    for (const chapterPager of chapterType.chapterPagers) {
-      const chapterPagerTreeOption: TreeOption = {
-        label: chapterPager.title,
-        key: await path.Join([comicInfo.title, chapterType.title, chapterPager.title]),
-        children: [],
-        isLeaf: false
-      }
-
-      for (const chapter of chapterPager.chapters) {
-        const saveDirectory = await path.Join([store.cacheDirectory, chapterPagerTreeOption.key as string, chapter.title])
-
-        const key = JSON.stringify({
-          href: chapter.href,
-          saveDirectory: saveDirectory
-        })
-
-        const directoryExists = await path.PathExists(saveDirectory)
-        const chapterTreeOption: TreeOption = {
-          label: chapter.title,
-          key: key,
-          isLeaf: true,
-          disabled: directoryExists,
-        }
-        if (directoryExists) {
-          chapterTreeOption.suffix = () => DownloadStatus.COMPLETED
-          defaultCheckedKeys.push(key)
-        }
-
-        chapterPagerTreeOption.children?.push(chapterTreeOption)
-      }
-
-      chapterTypeTreeOption.children?.push(chapterPagerTreeOption)
-    }
-
-    comicTreeOption.children?.push(chapterTypeTreeOption)
-  }
-
-  loading.value = false
-  store.downloadTreeOptions = [comicTreeOption]
-  store.downloadDefaultExpandKeys = defaultExpandedKeys
-  store.downloadDefaultCheckedKeys = defaultCheckedKeys
 }
 
 function onKeyEnterDown() {

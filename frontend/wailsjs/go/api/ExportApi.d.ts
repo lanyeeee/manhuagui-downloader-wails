@@ -3,7 +3,6 @@
 import {export_pdf} from '../models';
 import {types} from '../models';
 import {context} from '../models';
-import {scan_cache} from '../models';
 
 export function CreatePdfs(arg1:export_pdf.CreatePdfsRequest):Promise<types.Response>;
 
@@ -13,4 +12,4 @@ export function ScanCacheDir(arg1:string,arg2:number):Promise<types.Response>;
 
 export function Startup(arg1:context.Context):Promise<void>;
 
-export function TreeOptionModel():Promise<scan_cache.TreeNode>;
+export function TreeOptionModel():Promise<types.TreeNode>;

@@ -51,47 +51,6 @@ export namespace export_pdf {
 
 }
 
-export namespace scan_cache {
-	
-	export class TreeNode {
-	    label: string;
-	    key: string;
-	    children: TreeNode[];
-	    isLeaf: boolean;
-	
-	    static createFrom(source: any = {}) {
-	        return new TreeNode(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.label = source["label"];
-	        this.key = source["key"];
-	        this.children = this.convertValues(source["children"], TreeNode);
-	        this.isLeaf = source["isLeaf"];
-	    }
-	
-		convertValues(a: any, classs: any, asMap: boolean = false): any {
-		    if (!a) {
-		        return a;
-		    }
-		    if (a.slice) {
-		        return (a as any[]).map(elem => this.convertValues(elem, classs));
-		    } else if ("object" === typeof a) {
-		        if (asMap) {
-		            for (const key of Object.keys(a)) {
-		                a[key] = new classs(a[key]);
-		            }
-		            return a;
-		        }
-		        return new classs(a);
-		    }
-		    return a;
-		}
-	}
-
-}
-
 export namespace search {
 	
 	export class Chapter {
@@ -108,12 +67,12 @@ export namespace search {
 	        this.href = source["href"];
 	    }
 	}
-	export class ChapterPager {
+	export class ChapterPage {
 	    title: string;
 	    chapters: Chapter[];
 	
 	    static createFrom(source: any = {}) {
-	        return new ChapterPager(source);
+	        return new ChapterPage(source);
 	    }
 	
 	    constructor(source: any = {}) {
@@ -142,7 +101,7 @@ export namespace search {
 	}
 	export class ChapterType {
 	    title: string;
-	    chapterPagers: ChapterPager[];
+	    chapterPages: ChapterPage[];
 	
 	    static createFrom(source: any = {}) {
 	        return new ChapterType(source);
@@ -151,7 +110,7 @@ export namespace search {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.title = source["title"];
-	        this.chapterPagers = this.convertValues(source["chapterPagers"], ChapterPager);
+	        this.chapterPages = this.convertValues(source["chapterPages"], ChapterPage);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -224,6 +183,48 @@ export namespace types {
 	        this.msg = source["msg"];
 	        this.data = source["data"];
 	    }
+	}
+	export class TreeNode {
+	    label: string;
+	    key: string;
+	    children: TreeNode[];
+	    isLeaf: boolean;
+	    disabled: boolean;
+	    defaultChecked: boolean;
+	    defaultExpand: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new TreeNode(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.label = source["label"];
+	        this.key = source["key"];
+	        this.children = this.convertValues(source["children"], TreeNode);
+	        this.isLeaf = source["isLeaf"];
+	        this.disabled = source["disabled"];
+	        this.defaultChecked = source["defaultChecked"];
+	        this.defaultExpand = source["defaultExpand"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
 	}
 
 }

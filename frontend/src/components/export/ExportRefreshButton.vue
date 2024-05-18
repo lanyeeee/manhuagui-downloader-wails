@@ -2,7 +2,7 @@
 import {RefreshOutline as RefreshIcon} from "@vicons/ionicons5";
 import {ref, watch} from "vue";
 import {useDownloaderStore} from "../../stores/downloader";
-import {scan_cache, types} from "../../../wailsjs/go/models";
+import {types} from "../../../wailsjs/go/models";
 import {ScanCacheDir} from "../../../wailsjs/go/api/ExportApi";
 import {TreeOption, useNotification} from "naive-ui";
 import * as path from "../../../wailsjs/go/api/PathApi";
@@ -16,7 +16,7 @@ const store = useDownloaderStore()
 watch(() => store.cacheDirectory, onRefresh)
 
 
-async function buildOptionTree(node: scan_cache.TreeNode): Promise<TreeOption> {
+async function buildOptionTree(node: types.TreeNode): Promise<TreeOption> {
   const nodeOption: TreeOption = {key: node.key, label: node.label, isLeaf: node.isLeaf,}
   const relativePath: string = await path.GetRelPath(store.cacheDirectory, node.key)
   const pdfPath: string = await path.Join([store.exportDirectory, relativePath + ".pdf"])
@@ -47,7 +47,7 @@ async function onRefresh() {
       return
     }
 
-    const roots: scan_cache.TreeNode[] = response.data
+    const roots: types.TreeNode[] = response.data
     console.log(roots)
     // 清空原有的数据
     store.exportTreeOptions.length = 0
