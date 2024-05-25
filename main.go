@@ -42,6 +42,9 @@ func main() {
 			settingsApi,
 			utilsApi,
 		},
+		Debug: options.Debug{
+			OpenInspectorOnStartup: true,
+		},
 	})
 
 	if err != nil {
