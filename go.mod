@@ -8,8 +8,8 @@ require (
 	github.com/PuerkitoBio/goquery v1.9.2
 	github.com/daku10/go-lz-string v0.0.6
 	github.com/pdfcpu/pdfcpu v0.8.0
-	github.com/wailsapp/wails/v2 v2.8.1
-	golang.org/x/net v0.24.0
+	github.com/wailsapp/wails/v2 v2.8.2
+	golang.org/x/net v0.25.0
 	golang.org/x/sync v0.7.0
 )
 
@@ -40,11 +40,11 @@ require (
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/wailsapp/go-webview2 v1.0.10 // indirect
 	github.com/wailsapp/mimetype v1.4.1 // indirect
-	golang.org/x/crypto v0.22.0 // indirect
+	golang.org/x/crypto v0.23.0 // indirect
 	golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1 // indirect
 	golang.org/x/image v0.15.0 // indirect
-	golang.org/x/sys v0.19.0 // indirect
-	golang.org/x/text v0.14.0 // indirect
+	golang.org/x/sys v0.20.0 // indirect
+	golang.org/x/text v0.15.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
 
