@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, ref} from "vue"
+import {defineModel, defineProps, ref} from "vue"
 import {TreeOption, useNotification} from "naive-ui"
 import {useDownloaderStore} from "../../stores/downloader"
 import {SearchOutline as SearchIcon} from "@vicons/ionicons5"
@@ -7,13 +7,20 @@ import {SearchComicInfo} from "../../../wailsjs/go/api/DownloadApi"
 import {types} from "../../../wailsjs/go/models"
 import {DownloadStatus} from "../../constants/download-constant";
 
-
+// TODO: 支持通过漫画名搜索
 const store = useDownloaderStore()
 const notification = useNotification()
 
+const downloadTreeOptions = defineModel<TreeOption[]>("downloadTreeOptions", {required: true});
+const downloadDefaultExpandKeys = defineModel<string[]>("downloadDefaultExpandKeys", {required: true});
+const downloadDefaultCheckedKeys = defineModel<string[]>("downloadDefaultCheckedKeys", {required: true});
+
 const searchInput = ref<string>("")
 const loading = ref<boolean>(false)
-const disabled = computed<boolean>(() => store.searchDisabled)
+
+const props = defineProps<{
+  disabled: boolean
+}>()
 
 function buildOptionTree(node: types.TreeNode): TreeOption {
   const nodeOption: TreeOption = {
@@ -25,11 +32,11 @@ function buildOptionTree(node: types.TreeNode): TreeOption {
   }
 
   if (node.defaultChecked) {
-    store.downloadDefaultCheckedKeys.push(node.key)
+    downloadDefaultCheckedKeys.value?.push(node.key)
     nodeOption.suffix = () => DownloadStatus.COMPLETED
   }
   if (node.defaultExpand) {
-    store.downloadDefaultExpandKeys.push(node.key)
+    downloadDefaultExpandKeys.value?.push(node.key)
   }
 
   for (const child of node.children) {
@@ -41,7 +48,7 @@ function buildOptionTree(node: types.TreeNode): TreeOption {
 }
 
 async function onSearch() {
-  if (loading.value || disabled.value) {
+  if (loading.value || props.disabled) {
     return
   }
 
@@ -63,7 +70,7 @@ async function onSearch() {
     console.log("搜索结果", root)
     const rootOption = buildOptionTree(root)
 
-    store.downloadTreeOptions = [rootOption]
+    downloadTreeOptions.value = [rootOption]
 
   } finally {
     loading.value = false
@@ -95,17 +102,16 @@ function extractComicIdFromInput(): string | null {
 </script>
 
 <template>
-  <div class="flex gap-x-4">
+  <div class="flex gap-x-2">
     <n-button text tag="a" href="https://www.manhuagui.com/" target="_blank" type="primary">
       漫画柜
     </n-button>
-    <n-input class="search-input" v-model:value="searchInput" placeholder="漫画ID或漫画链接" clearable
+    <n-input v-model:value="searchInput" placeholder="漫画ID或漫画链接" clearable
              @keydown.enter="onKeyEnterDown"
     />
     <n-popover trigger="hover">
       <template #trigger>
-        <n-button class="search-button"
-                  @click="onSearch"
+        <n-button @click="onSearch"
                   type="primary"
                   :loading="loading"
                   :disabled="disabled"
@@ -123,12 +129,4 @@ function extractComicIdFromInput(): string | null {
   </div>
 </template>
 
-<style scoped>
-.search-input {
-  flex: 4
-}
 
-.search-button {
-  flex: 1
-}
-</style>
