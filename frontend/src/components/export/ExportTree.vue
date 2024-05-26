@@ -25,6 +25,7 @@ const treeNodeClickBehaviour: TreeOverrideNodeClickBehavior = ({option}) => {
   <div class="h-full overflow-hidden">
     <n-result v-if="showInfo" title="缓存目录为空"/>
     <n-tree
+        class="text-align-left"
         v-if="!showInfo"
         block-line
         show-line
@@ -35,7 +36,6 @@ const treeNodeClickBehaviour: TreeOverrideNodeClickBehavior = ({option}) => {
         :default-checked-keys="store.exportDefaultCheckedKeys"
         :override-default-node-click-behavior="treeNodeClickBehaviour"
         ref="treeRef"
-        class="text-align-left"
     />
   </div>
 </template>

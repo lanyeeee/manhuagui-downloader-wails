@@ -15,13 +15,13 @@ onMounted(async () => {
 <template>
   <n-notification-provider placement="bottom-right">
     <n-tabs default-value="download" type="line" animated class="h-screen p-3">
-      <n-tab-pane name="download" tab="下载" class="h-full p-0!">
+      <n-tab-pane class="h-full p-0!" name="download" tab="下载">
         <download-pane></download-pane>
       </n-tab-pane>
-      <n-tab-pane name="export" tab="导出" class="h-full p-0!">
+      <n-tab-pane class="h-full p-0!" name="export" tab="导出">
         <export-pane></export-pane>
       </n-tab-pane>
-      <n-tab-pane name="settings" tab="设置" class="h-full p-0!">
+      <n-tab-pane class="h-full p-0!" name="settings" tab="设置">
         <settings-pane></settings-pane>
       </n-tab-pane>
     </n-tabs>

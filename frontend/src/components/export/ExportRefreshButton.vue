@@ -79,8 +79,12 @@ async function onRefresh() {
 <template>
   <div class="flex">
     <div class="flex-initial w-200"/>
-    <n-button @click="onRefresh" type="primary" secondary :loading="loading" :disabled="store.refreshDisabled"
-              class="flex-1">
+    <n-button class="flex-1"
+              @click="onRefresh"
+              type="primary"
+              secondary
+              :loading="loading"
+              :disabled="store.refreshDisabled">
       重新扫描缓存目录
       <template #icon>
         <n-icon>
