@@ -5,9 +5,9 @@ import ExportRefreshButton from "./ExportRefreshButton.vue";
 </script>
 
 <template>
-  <n-flex vertical>
+  <div class="flex flex-col h-full">
     <export-refresh-button/>
-    <export-tree/>
+    <export-tree />
     <export-bar/>
-  </n-flex>
+  </div>
 </template>

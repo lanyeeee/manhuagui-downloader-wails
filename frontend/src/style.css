@@ -21,7 +21,10 @@ body {
 
 #app {
     height: 100vh;
-    text-align: center;
+}
+
+.n-tabs-pane-wrapper {
+    @apply h-full
 }
 
 

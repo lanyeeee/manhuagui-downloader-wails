@@ -95,25 +95,27 @@ function extractComicIdFromInput(): string | null {
 </script>
 
 <template>
-  <n-button text tag="a" href="https://www.manhuagui.com/" target="_blank" type="primary">
-    漫画柜
-  </n-button>
-  <n-input class="search-input" v-model:value="searchInput" placeholder="漫画ID或漫画链接" clearable
-           @keydown.enter="onKeyEnterDown"
-  />
-  <n-popover trigger="hover">
-    <template #trigger>
-      <n-button class="search-button" @click="onSearch" type="primary" :loading="loading" :disabled="disabled"
-                secondary>搜索
-        <template #icon>
-          <n-icon>
-            <search-icon/>
-          </n-icon>
-        </template>
-      </n-button>
-    </template>
-    <span>直接使用[回车键]也能搜索</span>
-  </n-popover>
+  <div class="flex gap-x-4">
+    <n-button text tag="a" href="https://www.manhuagui.com/" target="_blank" type="primary">
+      漫画柜
+    </n-button>
+    <n-input class="search-input" v-model:value="searchInput" placeholder="漫画ID或漫画链接" clearable
+             @keydown.enter="onKeyEnterDown"
+    />
+    <n-popover trigger="hover">
+      <template #trigger>
+        <n-button class="search-button" @click="onSearch" type="primary" :loading="loading" :disabled="disabled"
+                  secondary>搜索
+          <template #icon>
+            <n-icon>
+              <search-icon/>
+            </n-icon>
+          </template>
+        </n-button>
+      </template>
+      <span>直接使用[回车键]也能搜索</span>
+    </n-popover>
+  </div>
 </template>
 
 <style scoped>

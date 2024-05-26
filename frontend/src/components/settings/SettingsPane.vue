@@ -36,7 +36,7 @@ async function onChooseExportDirectory() {
 </script>
 
 <template>
-  <n-flex vertical justify="space-around" style="height: 90vh">
+  <div class="flex flex-col gap-y-10">
     <n-popover trigger="hover">
       <template #trigger>
         <n-input v-model:value="store.proxyUrl" placeholder="">
@@ -106,7 +106,7 @@ async function onChooseExportDirectory() {
       </template>
       <span>此参数用于限制导出树最大深度，防止扫描缓存目录的时间过长</span>
     </n-popover>
-  </n-flex>
+  </div>
 </template>
 
 
