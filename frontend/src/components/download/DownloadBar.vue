@@ -106,29 +106,29 @@ async function downloadOptions(optionsToDownload: (TreeOption | null)[]) {
 </script>
 
 <template>
-  <n-flex vertical>
-    <n-flex>
+  <div class="flex flex-col gap-y-3">
+    <div class="flex">
       <n-text>章节进度：</n-text>
       <n-progress type="line"
                   :percentage="chapterProgressPercentage"
                   :height="25"
                   indicator-placement="inside"
                   indicator-text-color="black"
-                  style="flex: 1"
+                  class="flex-1"
       >{{ chapterProgressIndicator }}
       </n-progress>
-    </n-flex>
-    <n-flex>
+    </div>
+    <div class="flex">
       <n-text>总体进度：</n-text>
       <n-progress type="line"
                   :percentage="overallProgressPercentage"
                   :height="25"
                   indicator-placement="inside"
                   indicator-text-color="black"
-                  style="flex: 1"
+                  class="flex-1"
       >{{ overallProgressIndicator }}
       </n-progress>
-    </n-flex>
+    </div>
     <template v-if="downloadButtonDisabled">
       <n-popover trigger="hover">
         <template #trigger>
@@ -158,6 +158,6 @@ async function downloadOptions(optionsToDownload: (TreeOption | null)[]) {
         </template>
       </n-button>
     </template>
-  </n-flex>
+  </div>
 </template>
 

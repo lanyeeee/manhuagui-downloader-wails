@@ -22,7 +22,7 @@ const treeNodeClickBehaviour: TreeOverrideNodeClickBehavior = ({option}) => {
 </script>
 
 <template>
-  <n-scrollbar style="height: 60vh">
+  <div class="h-full overflow-hidden">
     <n-result v-if="showInfo" title="缓存目录为空"/>
     <n-tree
         v-if="!showInfo"
@@ -35,7 +35,7 @@ const treeNodeClickBehaviour: TreeOverrideNodeClickBehavior = ({option}) => {
         :default-checked-keys="store.exportDefaultCheckedKeys"
         :override-default-node-click-behavior="treeNodeClickBehaviour"
         ref="treeRef"
-        style="text-align: left"
+        class="text-align-left"
     />
-  </n-scrollbar>
+  </div>
 </template>

@@ -25,7 +25,7 @@ async function buildOptionTree(node: types.TreeNode) {
   }
   if (node.defaultChecked) {
     store.exportDefaultCheckedKeys.push(node.key)
-    nodeOption.suffix = ()=> ExportStatus.COMPLETED
+    nodeOption.suffix = () => ExportStatus.COMPLETED
   }
   if (node.defaultExpand) {
     store.exportDefaultExpandKeys.push(node.key)
@@ -77,10 +77,10 @@ async function onRefresh() {
 </script>
 
 <template>
-  <n-flex>
-    <div style="flex: 3"/>
+  <div class="flex">
+    <div class="flex-initial w-200"/>
     <n-button @click="onRefresh" type="primary" secondary :loading="loading" :disabled="store.refreshDisabled"
-              style="flex: 1">
+              class="flex-1">
       重新扫描缓存目录
       <template #icon>
         <n-icon>
@@ -88,5 +88,5 @@ async function onRefresh() {
         </n-icon>
       </template>
     </n-button>
-  </n-flex>
+  </div>
 </template>

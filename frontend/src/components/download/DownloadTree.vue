@@ -21,9 +21,10 @@ const treeNodeClickBehaviour: TreeOverrideNodeClickBehavior = ({option}) => {
 </script>
 
 <template>
-  <n-scrollbar style="height: 60vh">
+  <div class="h-full overflow-hidden">
     <n-result v-if="showInfo" title="在搜索框中输入漫画链接"/>
     <n-tree
+        virtual-scroll
         v-if="!showInfo"
         block-line
         show-line
@@ -34,7 +35,7 @@ const treeNodeClickBehaviour: TreeOverrideNodeClickBehavior = ({option}) => {
         :default-checked-keys="store.downloadDefaultCheckedKeys"
         :override-default-node-click-behavior="treeNodeClickBehaviour"
         ref="treeRef"
-        style="text-align: left;"
+        class="text-align-left"
     />
-  </n-scrollbar>
+  </div>
 </template>

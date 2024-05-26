@@ -145,30 +145,29 @@ async function exportNonLeafOptions(optionsToExport: TreeOption[]) {
 </script>
 
 <template>
-  <n-flex vertical>
-    <n-flex>
+  <div class="flex flex-col gap-y-3">
+    <div class="flex">
       <n-text>生成进度：</n-text>
       <n-progress type="line"
                   :percentage="createProgressPercentage"
                   :height="25"
                   indicator-placement="inside"
                   indicator-text-color="black"
-                  style="flex: 1"
+                  class="flex-1"
       >{{ createProgressIndicator }}
       </n-progress>
-    </n-flex>
-    <n-flex>
+    </div>
+    <div class="flex">
       <n-text>合并进度：</n-text>
-      <n-progress class="n-progress" type="line"
+      <n-progress class="n-progress flex-1" type="line"
                   :percentage="mergeProgressPercentage"
                   :height="25"
                   indicator-placement="inside"
                   indicator-text-color="black"
-                  style="flex: 1"
       >{{ mergeProgressIndicator }}
       </n-progress>
-    </n-flex>
-    <n-button class="n-progress" @click="onExport" type="primary" style="flex: 1"
+    </div>
+    <n-button class="n-progress flex-1" @click="onExport" type="primary"
               :disabled="disabled"
               :loading="buttonLoading">
       导出
@@ -178,5 +177,5 @@ async function exportNonLeafOptions(optionsToExport: TreeOption[]) {
         </n-icon>
       </template>
     </n-button>
-  </n-flex>
+  </div>
 </template>

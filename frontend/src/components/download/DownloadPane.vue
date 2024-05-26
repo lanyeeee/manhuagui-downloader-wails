@@ -6,12 +6,10 @@ import DownloadBar from "./DownloadBar.vue";
 </script>
 
 <template>
-  <n-flex vertical>
-    <n-flex>
-      <download-search-bar/>
-    </n-flex>
+  <div class="flex flex-col h-full">
+    <download-search-bar/>
     <download-tree/>
     <download-bar/>
-  </n-flex>
+  </div>
 </template>
 
