@@ -1,15 +1,11 @@
 <script lang="ts" setup>
-import {NTree, TreeInst, TreeOverrideNodeClickBehavior} from "naive-ui"
-import {computed, ref, watch} from "vue"
-import {useDownloaderStore} from "../../stores/downloader"
+import {NTree, TreeInst, TreeOption, TreeOverrideNodeClickBehavior} from "naive-ui"
+import {defineModel} from "vue"
 
-const store = useDownloaderStore()
-
-const showInfo = computed<boolean>(() => store.downloadTreeOptions.length === 0)
-const treeRef = ref<TreeInst | null>(null)
-watch(treeRef, () => {
-  store.downloadTreeInst = treeRef.value
-})
+const downloadTreeInst = defineModel<TreeInst | null>("downloadTreeInst", {required: true});
+const downloadTreeOptions = defineModel<TreeOption[]>("downloadTreeOptions", {required: true});
+const downloadDefaultExpandKeys = defineModel<string[]>("downloadDefaultExpandKeys", {required: true});
+const downloadDefaultCheckedKeys = defineModel<string[]>("downloadDefaultCheckedKeys", {required: true});
 
 const treeNodeClickBehaviour: TreeOverrideNodeClickBehavior = ({option}) => {
   if (option.children?.length === 0) {
@@ -18,24 +14,21 @@ const treeNodeClickBehaviour: TreeOverrideNodeClickBehavior = ({option}) => {
   return "toggleExpand"
 }
 
+
 </script>
 
 <template>
-  <div class="h-full overflow-hidden">
-    <n-result v-if="showInfo" title="在搜索框中输入漫画链接"/>
-    <n-tree
-        class="text-align-left"
-        virtual-scroll
-        v-if="!showInfo"
-        block-line
-        show-line
-        cascade
-        checkable
-        :data="store.downloadTreeOptions"
-        :default-expanded-keys="store.downloadDefaultExpandKeys"
-        :default-checked-keys="store.downloadDefaultCheckedKeys"
-        :override-default-node-click-behavior="treeNodeClickBehaviour"
-        ref="treeRef"
-    />
-  </div>
+  <n-tree
+      class="text-align-left overflow-hidden"
+      virtual-scroll
+      block-line
+      show-line
+      cascade
+      checkable
+      :data="downloadTreeOptions"
+      :default-expanded-keys="downloadDefaultExpandKeys"
+      :default-checked-keys="downloadDefaultCheckedKeys"
+      :override-default-node-click-behavior="treeNodeClickBehaviour"
+      ref="downloadTreeInst"
+  />
 </template>

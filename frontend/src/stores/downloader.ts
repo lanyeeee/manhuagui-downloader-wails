@@ -5,17 +5,11 @@ import {GetCpuNum} from "../../wailsjs/go/api/UtilsApi";
 
 export const useDownloaderStore = defineStore('downloader', {
     state: () => ({
-        downloadTreeInst: null as TreeInst | null,
-        downloadTreeOptions: [] as TreeOption[],
-        downloadDefaultExpandKeys: [] as string[],
-        downloadDefaultCheckedKeys: [] as string[],
-
         exportTreeInst: null as TreeInst | null,
         exportTreeOptions: [] as TreeOption[],
         exportDefaultExpandKeys: [] as string[],
         exportDefaultCheckedKeys: [] as string[],
 
-        searchDisabled: false,
         refreshDisabled: false,
 
         proxyUrl: "http://127.0.0.1:7890",
@@ -27,9 +21,6 @@ export const useDownloaderStore = defineStore('downloader', {
         exportTreeMaxDepth: 3,
     }),
     getters: {
-        checkedDownloadTreeOptions(state): (TreeOption | null)[] | undefined {
-            return state.downloadTreeInst?.getCheckedData().options
-        },
         checkedExportTreeOptions(state): (TreeOption | null)[] | undefined {
             return state.exportTreeInst?.getCheckedData().options
         },
