@@ -1,20 +1,24 @@
 <script setup lang="ts">
 import DownloadTree from "./DownloadTree.vue";
 import DownloadSearchBar from "./DownloadSearchBar.vue";
-import {computed, ref} from "vue";
+import {computed, ref, watch} from "vue";
 import {TreeInst, TreeOption} from "naive-ui";
 import DownloadList from "./DownloadList.vue";
 import {DownloadStatus} from "../../constants/download-constant";
+import {useDownloaderStore} from "../../stores/downloader";
 
-const showInfo = computed<boolean>(() => downloadTreeOptions.value.length === 0)
+const store = useDownloaderStore()
+
 
 const downloadTreeInst = ref<TreeInst | null>(null);
 const downloadTreeOptions = ref<TreeOption[]>([]);
 const downloadDefaultExpandKeys = ref<string[]>([]);
 const downloadDefaultCheckedKeys = ref<string[]>([]);
-
 const searchDisabled = ref<boolean>(false);
 
+watch(() => store.cacheDirectory, () => downloadTreeOptions.value = [])
+
+const showInfo = computed<boolean>(() => downloadTreeOptions.value.length === 0)
 const optionToDownload = computed<(TreeOption | null)[]>(() => downloadTreeInst
         .value
         ?.getCheckedData()
@@ -22,7 +26,6 @@ const optionToDownload = computed<(TreeOption | null)[]>(() => downloadTreeInst
         // 所有状态不是已完成的叶子节点就是要下载的
         .filter(option => option !== null && option.isLeaf && (option.suffix === undefined || option.suffix() !== DownloadStatus.COMPLETED))
     ?? [])
-
 const optionDownloading = computed<(TreeOption | null)[]>(() => downloadTreeInst
         .value
         ?.getCheckedData()
@@ -51,7 +54,7 @@ const optionDownloading = computed<(TreeOption | null)[]>(() => downloadTreeInst
                      v-model:download-default-checked-keys="downloadDefaultCheckedKeys"
       />
     </div>
-    <div class="flex-1 flex flex-col">
+    <div class="flex-1">
       <download-list :download-tree-inst="downloadTreeInst"
                      :download-tree-options="downloadTreeOptions"
                      :options-to-download="optionToDownload"

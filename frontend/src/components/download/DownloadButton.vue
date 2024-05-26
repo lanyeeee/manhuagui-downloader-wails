@@ -71,7 +71,7 @@ async function downloadOptions() {
   <n-button @click="onDownload" type="primary"
             :disabled="downloadButtonDisabled"
             :loading="downloadButtonLoading">
-    下载
+    开始下载
     <template #icon>
       <n-icon>
         <download-icon/>
