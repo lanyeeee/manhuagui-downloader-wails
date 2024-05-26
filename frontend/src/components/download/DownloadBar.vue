@@ -109,23 +109,25 @@ async function downloadOptions(optionsToDownload: (TreeOption | null)[]) {
   <div class="flex flex-col gap-y-3">
     <div class="flex">
       <n-text>章节进度：</n-text>
-      <n-progress type="line"
+      <n-progress class="flex-1"
+                  type="line"
                   :percentage="chapterProgressPercentage"
                   :height="25"
                   indicator-placement="inside"
                   indicator-text-color="black"
-                  class="flex-1"
+
       >{{ chapterProgressIndicator }}
       </n-progress>
     </div>
     <div class="flex">
       <n-text>总体进度：</n-text>
-      <n-progress type="line"
+      <n-progress class="flex-1"
+                  type="line"
                   :percentage="overallProgressPercentage"
                   :height="25"
                   indicator-placement="inside"
                   indicator-text-color="black"
-                  class="flex-1"
+
       >{{ overallProgressIndicator }}
       </n-progress>
     </div>

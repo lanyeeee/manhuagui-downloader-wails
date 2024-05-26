@@ -104,8 +104,13 @@ function extractComicIdFromInput(): string | null {
     />
     <n-popover trigger="hover">
       <template #trigger>
-        <n-button class="search-button" @click="onSearch" type="primary" :loading="loading" :disabled="disabled"
-                  secondary>搜索
+        <n-button class="search-button"
+                  @click="onSearch"
+                  type="primary"
+                  :loading="loading"
+                  :disabled="disabled"
+                  secondary>
+          搜索
           <template #icon>
             <n-icon>
               <search-icon/>
