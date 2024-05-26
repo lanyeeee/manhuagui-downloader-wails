@@ -20,7 +20,6 @@ async function onChooseCacheDirectory() {
     notification.create({type: "error", title: "选择缓存目录失败", meta: response.msg,})
   } else if (response.data !== "") {
     store.cacheDirectory = response.data as string
-    store.downloadTreeOptions = []
   }
 }
 
