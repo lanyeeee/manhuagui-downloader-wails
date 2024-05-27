@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
-import {NButton, NSpin, TreeOption, useNotification} from "naive-ui"
-import {computed, h, ref} from "vue"
+import {NButton, NSpin, TreeInst, TreeOption, useNotification} from "naive-ui"
+import {defineProps, h, ref} from "vue"
 import {useDownloaderStore} from "../../stores/downloader"
 import {BookOutline as ExportIcon} from "@vicons/ionicons5"
 import {ExportStatus} from "../../constants/export-constant"
@@ -14,7 +14,13 @@ import ExportDirectoryInput from "../settings/ExportDirectoryInput.vue";
 const store = useDownloaderStore()
 const notification = useNotification()
 
-const disabled = computed<boolean>(() => store.exportTreeOptions.length === 0)
+const props = defineProps<{
+  exportTreeInst: TreeInst | null,
+  exportTreeOptions: TreeOption[],
+}>()
+
+const refreshDisabled = defineModel<boolean>("refreshDisabled", {required: true})
+
 const buttonLoading = ref<boolean>(false)
 const createProgressIndicator = ref<string>("")
 const createProgressPercentage = ref<number>(0)
@@ -23,15 +29,15 @@ const mergeProgressPercentage = ref<number>(0)
 
 // TODO: 修改获取要被导出的option的逻辑，目前的实现没法配合列表动态调整
 async function onExport() {
-  const leafOptionsToExport = store.checkedExportTreeOptions
-      ?.filter(option =>
+  const leafOptionsToExport = props.exportTreeInst?.getCheckedData().options
+      .filter(option =>
           option !== null &&
           !option.disabled &&
           option.isLeaf
       ) as TreeOption[] ?? []
 
-  const nonLeafOptionsToExport = (store.checkedExportTreeOptions
-      ?.filter(option =>
+  const nonLeafOptionsToExport = (props.exportTreeInst?.getCheckedData().options
+      .filter(option =>
           option !== null &&
           !option.disabled &&
           !option.isLeaf
@@ -51,7 +57,7 @@ async function onExport() {
 
   try {
     buttonLoading.value = true
-    store.refreshDisabled = true
+    refreshDisabled.value = true
     createProgressPercentage.value = 0
     createProgressIndicator.value = `(${0}/${leafOptionsToExport.length})`
     mergeProgressPercentage.value = 0
@@ -71,7 +77,7 @@ async function onExport() {
     await exportNonLeafOptions(nonLeafOptionsToExport)
   } finally {
     buttonLoading.value = false
-    store.refreshDisabled = false
+    refreshDisabled.value = false
   }
 }
 
@@ -178,7 +184,6 @@ async function onOpenExportDirectory() {
     <n-button class="n-progress"
               @click="onExport"
               type="primary"
-              :disabled="disabled"
               :loading="buttonLoading"
     >开始导出
       <template #icon>
