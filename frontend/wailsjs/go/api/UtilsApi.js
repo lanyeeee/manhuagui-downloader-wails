@@ -6,6 +6,14 @@ export function GetCpuNum() {
   return window['go']['api']['UtilsApi']['GetCpuNum']();
 }
 
+export function GetUserDownloadPath() {
+  return window['go']['api']['UtilsApi']['GetUserDownloadPath']();
+}
+
+export function GetUserProxy() {
+  return window['go']['api']['UtilsApi']['GetUserProxy']();
+}
+
 export function Startup(arg1) {
   return window['go']['api']['UtilsApi']['Startup'](arg1);
 }

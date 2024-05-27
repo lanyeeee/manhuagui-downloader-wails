@@ -25,7 +25,3 @@ export function PathExists(arg1) {
 export function Startup(arg1) {
   return window['go']['api']['PathApi']['Startup'](arg1);
 }
-
-export function UserDownloadPath() {
-  return window['go']['api']['PathApi']['UserDownloadPath']();
-}

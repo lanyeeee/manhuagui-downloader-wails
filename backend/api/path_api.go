@@ -52,15 +52,3 @@ func (p *PathApi) Join(args ...interface{}) string {
 func (p *PathApi) MkDirAll(path string) error {
 	return os.MkdirAll(path, 0777)
 }
-
-func (p *PathApi) UserDownloadPath() (string, error) {
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		return "", err
-	}
-
-	downloadPath := path.Join(homeDir, "Downloads")
-	downloadPath = filepath.ToSlash(downloadPath)
-
-	return downloadPath, nil
-}

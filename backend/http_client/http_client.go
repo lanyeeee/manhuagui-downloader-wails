@@ -7,7 +7,6 @@ import (
 	"sync"
 )
 
-// TODO: 支持使用系统代理
 var httpClientInst *http.Client
 var once sync.Once
 
