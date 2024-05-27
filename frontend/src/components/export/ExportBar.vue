@@ -6,9 +6,10 @@ import {useDownloaderStore} from "../../stores/downloader"
 import {BookOutline as ExportIcon} from "@vicons/ionicons5"
 import {ExportStatus} from "../../constants/export-constant"
 import {export_pdf} from "../../../wailsjs/go/models"
-import {EventsOff, EventsOn} from "../../../wailsjs/runtime"
+import {BrowserOpenURL, EventsOff, EventsOn} from "../../../wailsjs/runtime"
 import * as path from "../../../wailsjs/go/api/PathApi"
 import {CreatePdfs, MergePdfs} from "../../../wailsjs/go/api/ExportApi"
+import ExportDirectoryInput from "../settings/ExportDirectoryInput.vue";
 
 const store = useDownloaderStore()
 const notification = useNotification()
@@ -142,11 +143,14 @@ async function exportNonLeafOptions(optionsToExport: TreeOption[]) {
   }
 }
 
+async function onOpenExportDirectory() {
+  BrowserOpenURL(store.exportDirectory)
+}
 
 </script>
 
 <template>
-  <div class="flex flex-col gap-y-3">
+  <div class="flex flex-col gap-y-2">
     <div class="flex">
       <n-text>生成进度：</n-text>
       <n-progress class="flex-1"
@@ -169,17 +173,20 @@ async function exportNonLeafOptions(optionsToExport: TreeOption[]) {
       >{{ mergeProgressIndicator }}
       </n-progress>
     </div>
-    <n-button class="n-progress flex-1"
+
+    <export-directory-input/>
+    <n-button class="n-progress"
               @click="onExport"
               type="primary"
               :disabled="disabled"
               :loading="buttonLoading"
-    >导出
+    >开始导出
       <template #icon>
         <n-icon>
           <export-icon/>
         </n-icon>
       </template>
     </n-button>
+    <n-button @click="onOpenExportDirectory">打开导出目录</n-button>
   </div>
 </template>

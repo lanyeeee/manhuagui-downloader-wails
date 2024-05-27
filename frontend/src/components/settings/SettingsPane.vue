@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import {onMounted, ref} from "vue"
-import {useNotification} from "naive-ui"
 import {useDownloaderStore} from "../../stores/downloader"
 import {GetCpuNum} from "../../../wailsjs/go/api/UtilsApi"
-import {ChooseDirectory} from "../../../wailsjs/go/api/SettingsApi"
+import CacheDirectoryInput from "./CacheDirectoryInput.vue";
+import ExportDirectoryInput from "./ExportDirectoryInput.vue";
 
 const store = useDownloaderStore()
-const notification = useNotification()
 
 const maxExportConcurrentCount = ref<number>(0)
 
@@ -14,54 +13,21 @@ onMounted(async () => {
   maxExportConcurrentCount.value = await GetCpuNum()
 })
 
-async function onChooseCacheDirectory() {
-  const response = await ChooseDirectory(store.cacheDirectory)
-  if (response.code != 0) {
-    notification.create({type: "error", title: "选择缓存目录失败", meta: response.msg,})
-  } else if (response.data !== "") {
-    store.cacheDirectory = response.data as string
-  }
-}
-
-async function onChooseExportDirectory() {
-  const response = await ChooseDirectory(store.exportDirectory)
-  if (response.code != 0) {
-    notification.create({type: "error", title: "选择导出目录失败", meta: response.msg,})
-  } else if (response.data !== "") {
-    store.exportDirectory = response.data as string
-  }
-}
 
 </script>
 
 <template>
-  <div class="flex flex-col gap-y-10">
+  <div class="flex flex-col gap-y-10 p-2">
     <n-popover trigger="hover">
       <template #trigger>
-        <n-input v-model:value="store.proxyUrl" placeholder="">
+        <n-input class="text-align-left flex" v-model:value="store.proxyUrl" placeholder="">
           <template #prefix>代理地址：</template>
         </n-input>
       </template>
       <span>如果不使用代理，请清空这个输入框</span>
     </n-popover>
-    <n-popover trigger="hover">
-      <template #trigger>
-        <n-input v-model:value="store.cacheDirectory" readonly placeholder=""
-                 @click="onChooseCacheDirectory">
-          <template #prefix>缓存目录：</template>
-        </n-input>
-      </template>
-      <span>{{ store.cacheDirectory }}</span>
-    </n-popover>
-    <n-popover trigger="hover">
-      <template #trigger>
-        <n-input v-model:value="store.exportDirectory" placeholder="" readonly
-                 @click="onChooseExportDirectory">
-          <template #prefix>导出目录：</template>
-        </n-input>
-      </template>
-      <span>{{ store.exportDirectory }}</span>
-    </n-popover>
+    <cache-directory-input/>
+    <export-directory-input/>
     <n-popover trigger="hover">
       <template #trigger>
         <n-input-number v-model:value="store.downloadInterval" placeholder="0" :min="0" :max="600">
