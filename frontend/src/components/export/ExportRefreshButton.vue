@@ -77,20 +77,20 @@ async function onRefresh() {
 </script>
 
 <template>
-  <div class="flex">
+  <div class="flex flex-col gap-y-2">
     <n-button class="flex-1"
               @click="onRefresh"
               type="primary"
               secondary
               :loading="loading"
               :disabled="store.refreshDisabled">
-      重新扫描缓存目录
+      重新扫描
       <template #icon>
         <n-icon>
           <refresh-icon/>
         </n-icon>
       </template>
     </n-button>
-    <div class="flex-initial w-4/5"/>
+
   </div>
 </template>

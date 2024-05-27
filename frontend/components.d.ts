@@ -7,6 +7,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    CacheDirectoryInput: typeof import('./src/components/settings/CacheDirectoryInput.vue')['default']
     DownloadButton: typeof import('./src/components/download/DownloadButton.vue')['default']
     DownloadList: typeof import('./src/components/download/DownloadList.vue')['default']
     DownloadPane: typeof import('./src/components/download/DownloadPane.vue')['default']
@@ -14,6 +15,7 @@ declare module 'vue' {
     DownloadSearchBar: typeof import('./src/components/download/DownloadSearchBar.vue')['default']
     DownloadTree: typeof import('./src/components/download/DownloadTree.vue')['default']
     ExportBar: typeof import('./src/components/export/ExportBar.vue')['default']
+    ExportDirectoryInput: typeof import('./src/components/settings/ExportDirectoryInput.vue')['default']
     ExportPane: typeof import('./src/components/export/ExportPane.vue')['default']
     ExportRefreshButton: typeof import('./src/components/export/ExportRefreshButton.vue')['default']
     ExportTree: typeof import('./src/components/export/ExportTree.vue')['default']

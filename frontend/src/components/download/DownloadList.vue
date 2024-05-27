@@ -5,6 +5,7 @@ import DownloadProgress from "./DownloadProgress.vue";
 import DownloadButton from "./DownloadButton.vue";
 import {BrowserOpenURL} from "../../../wailsjs/runtime";
 import {useDownloaderStore} from "../../stores/downloader";
+import CacheDirectoryInput from "../settings/CacheDirectoryInput.vue";
 
 const store = useDownloaderStore()
 
@@ -19,7 +20,7 @@ const downloadProgresses = ref<(InstanceType<typeof DownloadProgress>)[]>([])
 
 const searchDisabled = defineModel<boolean>("searchDisabled", {required: true})
 
-async function openCacheDirectory() {
+async function onOpenCacheDirectory() {
   BrowserOpenURL(store.cacheDirectory)
 }
 
@@ -38,6 +39,7 @@ async function openCacheDirectory() {
       </div>
     </n-scrollbar>
 
+    <cache-directory-input/>
     <download-button
         :download-tree-inst="downloadTreeInst"
         :download-tree-options="downloadTreeOptions"
@@ -45,7 +47,7 @@ async function openCacheDirectory() {
         :download-progresses="downloadProgresses"
         v-model:search-disabled="searchDisabled"
     />
-    <n-button @click="openCacheDirectory">打开下载目录</n-button>
+    <n-button @click="onOpenCacheDirectory">打开缓存目录</n-button>
   </div>
 
 </template>
