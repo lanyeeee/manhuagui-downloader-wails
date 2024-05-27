@@ -41,7 +41,14 @@ type ChapterTreeNodeKey struct {
 	SaveDir string `json:"saveDir"`
 }
 
-func Info(comicId string, cacheDir string) (types.TreeNode, error) {
+type ComicSearchResult struct {
+	Title   string   `json:"title"`
+	Authors []string `json:"authors"`
+	ComicId string   `json:"comicId"`
+}
+
+// TODO: 支持隐藏内容下载
+func ComicByComicId(comicId string, cacheDir string) (types.TreeNode, error) {
 	resp, err := http_client.HttpClientInst().Get("https://www.manhuagui.com/comic/" + comicId)
 	if err != nil {
 		return types.TreeNode{}, fmt.Errorf("do request failed: %w", err)
@@ -88,6 +95,57 @@ func Info(comicId string, cacheDir string) (types.TreeNode, error) {
 	}
 
 	return root, nil
+}
+
+func ComicByKeyword(keyword string) ([]ComicSearchResult, error) {
+	resp, err := http_client.HttpClientInst().Get(fmt.Sprintf("https://www.manhuagui.com/s/%s.html", keyword))
+	if err != nil {
+		return []ComicSearchResult{}, fmt.Errorf("do request failed: %w", err)
+	}
+	defer func(Body io.ReadCloser) { _ = Body.Close() }(resp.Body)
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return []ComicSearchResult{}, fmt.Errorf("read response body failed: %w", err)
+	}
+
+	htmlContent := string(respBody)
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlContent))
+	if err != nil {
+		return []ComicSearchResult{}, fmt.Errorf("parse html failed: %w", err)
+	}
+
+	var results []ComicSearchResult
+	doc.Find(".book-detail").Each(func(_ int, div *goquery.Selection) {
+		var result ComicSearchResult
+		// 获取书名和漫画ID
+		a := div.Find("dt a").First()
+		title, titleExists := a.Attr("title")
+		if titleExists {
+			result.Title = title
+		}
+		href, hrefExists := a.Attr("href")
+		if hrefExists {
+			parts := strings.Split(href, "/")
+			result.ComicId = parts[2]
+		}
+
+		// 获取作者名
+		div.Find("dd.tags span a").Each(func(_ int, s *goquery.Selection) {
+			// 跳过非作者链接
+			href, hrefExists := s.Attr("href")
+			if !hrefExists || !strings.HasPrefix(href, "/author/") {
+				return
+			}
+
+			author, authorExist := s.Attr("title")
+			if authorExist {
+				result.Authors = append(result.Authors, author)
+			}
+		})
+
+		results = append(results, result)
+	})
+	return results, nil
 }
 
 func getTitle(doc *goquery.Document) (string, error) {

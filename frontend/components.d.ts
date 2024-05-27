@@ -13,6 +13,7 @@ declare module 'vue' {
     DownloadPane: typeof import('./src/components/download/DownloadPane.vue')['default']
     DownloadProgress: typeof import('./src/components/download/DownloadProgress.vue')['default']
     DownloadSearchBar: typeof import('./src/components/download/DownloadSearchBar.vue')['default']
+    DownloadSearchList: typeof import('./src/components/download/DownloadSearchList.vue')['default']
     DownloadTree: typeof import('./src/components/download/DownloadTree.vue')['default']
     ExportBar: typeof import('./src/components/export/ExportBar.vue')['default']
     ExportDirectoryInput: typeof import('./src/components/settings/ExportDirectoryInput.vue')['default']

@@ -6,8 +6,12 @@ import {context} from '../models';
 
 export function ComicInfoModel():Promise<search.ComicInfo>;
 
+export function ComicSearchResultModel():Promise<search.ComicSearchResult>;
+
 export function DownloadChapter(arg1:string,arg2:string,arg3:number,arg4:string):Promise<types.Response>;
 
-export function SearchComicInfo(arg1:string,arg2:string,arg3:string):Promise<types.Response>;
+export function SearchComicById(arg1:string,arg2:string,arg3:string):Promise<types.Response>;
+
+export function SearchComicByKeyword(arg1:string,arg2:string):Promise<types.Response>;
 
 export function Startup(arg1:context.Context):Promise<void>;

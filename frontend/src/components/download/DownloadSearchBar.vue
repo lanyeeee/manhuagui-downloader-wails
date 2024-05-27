@@ -2,25 +2,33 @@
 import {defineModel, defineProps, ref} from "vue"
 import {TreeOption, useNotification} from "naive-ui"
 import {useDownloaderStore} from "../../stores/downloader"
-import {SearchOutline as SearchIcon} from "@vicons/ionicons5"
-import {SearchComicInfo} from "../../../wailsjs/go/api/DownloadApi"
-import {types} from "../../../wailsjs/go/models"
+import {ArrowUpOutline as ArrowUpIcon, SearchOutline as SearchIcon} from "@vicons/ionicons5"
+import {SearchComicById, SearchComicByKeyword} from "../../../wailsjs/go/api/DownloadApi"
+import {search, types} from "../../../wailsjs/go/models"
 import {DownloadStatus} from "../../constants/download-constant";
+import ComicSearchResult = search.ComicSearchResult;
 
-// TODO: 支持通过漫画名搜索
 const store = useDownloaderStore()
 const notification = useNotification()
 
 const downloadTreeOptions = defineModel<TreeOption[]>("downloadTreeOptions", {required: true});
 const downloadDefaultExpandKeys = defineModel<string[]>("downloadDefaultExpandKeys", {required: true});
 const downloadDefaultCheckedKeys = defineModel<string[]>("downloadDefaultCheckedKeys", {required: true});
+const searchResultType = defineModel<"empty" | "tree" | "list">("searchResultType", {required: true})
 
-const searchInput = ref<string>("")
-const loading = ref<boolean>(false)
+const searchByKeywordInput = ref<string>("")
+const searchByKeywordButtonLoading = ref<boolean>(false)
+const searchByKeywordButtonDisabled = ref<boolean>(false)
+
+const searchByIdInput = ref<string>("")
+const searchByIdButtonLoading = ref<boolean>(false)
+const searchByIdButtonDisabled = ref<boolean>(false)
 
 const props = defineProps<{
   disabled: boolean
 }>()
+
+const searchByKeywordResult = defineModel<ComicSearchResult[]>("searchByKeywordResult", {required: true})
 
 function buildOptionTree(node: types.TreeNode): TreeOption {
   const nodeOption: TreeOption = {
@@ -47,20 +55,45 @@ function buildOptionTree(node: types.TreeNode): TreeOption {
   return nodeOption
 }
 
-async function onSearch() {
-  if (loading.value || props.disabled) {
+async function searchByKeyword(keyword: string) {
+  if (props.disabled || searchByKeywordButtonDisabled.value) {
     return
   }
 
-  const comicId = extractComicIdFromInput()
+  try {
+    searchByKeywordButtonLoading.value = true
+    searchByIdButtonDisabled.value = true
+    const response = await SearchComicByKeyword(keyword, store.proxyUrl)
+    if (response.code != 0) {
+      notification.create({type: "error", title: "搜索失败", meta: response.msg,})
+      return
+    }
+
+    const searchResult: ComicSearchResult[] = response.data ?? []
+    console.log("搜索结果", searchResult)
+    searchByKeywordResult.value = searchResult
+    searchResultType.value = "list"
+  } finally {
+    searchByKeywordButtonLoading.value = false
+    searchByIdButtonDisabled.value = false
+  }
+
+}
+
+async function searchById(input: string) {
+  if (props.disabled || searchByIdButtonDisabled.value) {
+    return
+  }
+  const comicId = isNumeric(input) ? input : extractComicIdFrom(input)
   if (!comicId) {
     notification.create({type: "error", title: "搜索失败", content: "请输入漫画ID或漫画链接", duration: 2000,})
     return
   }
 
   try {
-    loading.value = true
-    const response = await SearchComicInfo(comicId, store.proxyUrl, store.cacheDirectory)
+    searchByIdButtonLoading.value = true
+    searchByKeywordButtonDisabled.value = true
+    const response = await SearchComicById(comicId, store.proxyUrl, store.cacheDirectory)
     if (response.code != 0) {
       notification.create({type: "error", title: "搜索失败", meta: response.msg,})
       return
@@ -71,22 +104,19 @@ async function onSearch() {
     const rootOption = buildOptionTree(root)
 
     downloadTreeOptions.value = [rootOption]
+    searchResultType.value = "tree"
 
   } finally {
-    loading.value = false
+    searchByIdButtonLoading.value = false
+    searchByKeywordButtonDisabled.value = false
   }
-}
-
-function onKeyEnterDown() {
-  onSearch()
 }
 
 function isNumeric(value: string) {
   return !isNaN(Number(value))
 }
 
-function extractComicIdFromInput(): string | null {
-  const input = searchInput.value.trim()
+function extractComicIdFrom(input: string): string | null {
   if (isNumeric(input)) {
     return input
   }
@@ -99,33 +129,64 @@ function extractComicIdFromInput(): string | null {
   return null
 }
 
+defineExpose({
+  searchById
+})
+
 </script>
 
 <template>
-  <div class="flex gap-x-2">
-    <n-button text tag="a" href="https://www.manhuagui.com/" target="_blank" type="primary">
-      漫画柜
-    </n-button>
-    <n-input v-model:value="searchInput" placeholder="漫画ID或漫画链接" clearable
-             @keydown.enter="onKeyEnterDown"
-    />
-    <n-popover trigger="hover">
-      <template #trigger>
-        <n-button @click="onSearch"
-                  type="primary"
-                  :loading="loading"
-                  :disabled="disabled"
-                  secondary>
-          搜索
-          <template #icon>
-            <n-icon>
-              <search-icon/>
-            </n-icon>
-          </template>
-        </n-button>
-      </template>
-      <span>直接使用[回车键]也能搜索</span>
-    </n-popover>
+  <div class="flex flex-col gap-y-2">
+    <div class="flex-1 flex gap-x-2">
+      <n-input class="text-align-left"
+               v-model:value="searchByKeywordInput"
+               placeholder=""
+               clearable
+               @keydown.enter="searchByKeyword(searchByKeywordInput.trim())"
+      >
+        <template #prefix>
+          漫画名：
+        </template>
+      </n-input>
+      <n-button @click="searchByKeyword(searchByKeywordInput.trim())"
+                type="primary"
+                :loading="searchByKeywordButtonLoading"
+                :disabled="disabled || searchByKeywordButtonDisabled"
+                secondary
+      >搜索
+        <template #icon>
+          <n-icon>
+            <search-icon/>
+          </n-icon>
+        </template>
+      </n-button>
+    </div>
+
+    <div class="flex-1 flex gap-x-2">
+      <n-input class="text-align-left"
+               v-model:value="searchByIdInput"
+               placeholder="链接也行"
+               clearable
+               @keydown.enter="searchById(searchByIdInput.trim())"
+      >
+        <template #prefix>
+          漫画ID：
+        </template>
+      </n-input>
+
+      <n-button @click="searchById(searchByIdInput.trim())"
+                type="primary"
+                :loading="searchByIdButtonLoading"
+                :disabled="disabled || searchByIdButtonDisabled"
+                secondary
+      >直达
+        <template #icon>
+          <n-icon>
+            <arrow-up-icon/>
+          </n-icon>
+        </template>
+      </n-button>
+    </div>
   </div>
 </template>
 
