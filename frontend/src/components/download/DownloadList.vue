@@ -7,6 +7,7 @@ import {BrowserOpenURL} from "../../../wailsjs/runtime";
 import {useDownloaderStore} from "../../stores/downloader";
 import CacheDirectoryInput from "../settings/CacheDirectoryInput.vue";
 
+
 const store = useDownloaderStore()
 
 const props = defineProps<{
@@ -16,7 +17,7 @@ const props = defineProps<{
   optionsDownloading: (TreeOption | null)[],
 }>()
 
-const downloadProgresses = ref<(InstanceType<typeof DownloadProgress>)[]>([])
+const downloadProgressRefs = ref<(InstanceType<typeof DownloadProgress>)[]>([])
 
 const searchDisabled = defineModel<boolean>("searchDisabled", {required: true})
 
@@ -33,7 +34,7 @@ async function onOpenCacheDirectory() {
         <n-h3>下载队列</n-h3>
         <download-progress v-for="option in props.optionsDownloading"
                            :key="option?.key"
-                           ref="downloadProgresses"
+                           ref="downloadProgressRefs"
                            :tree-option="option"
         />
       </div>
@@ -44,7 +45,7 @@ async function onOpenCacheDirectory() {
         :download-tree-inst="downloadTreeInst"
         :download-tree-options="downloadTreeOptions"
         :options-to-download="optionsToDownload"
-        :download-progresses="downloadProgresses"
+        :download-progress-refs="downloadProgressRefs"
         v-model:search-disabled="searchDisabled"
     />
     <n-button @click="onOpenCacheDirectory">打开缓存目录</n-button>

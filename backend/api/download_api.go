@@ -20,22 +20,45 @@ func (d *DownloadApi) Startup(ctx context.Context) {
 	d.ctx = ctx
 }
 
-func (d *DownloadApi) SearchComicInfo(comicId string, proxyUrl string, cacheDir string) types.Response {
+func (d *DownloadApi) SearchComicById(comicId string, proxyUrl string, cacheDir string) types.Response {
 	resp := types.Response{}
+
 	err := http_client.UpdateProxy(proxyUrl)
 	if err != nil {
 		resp.Code = -1
 		resp.Msg = err.Error()
-		return types.Response{}
+		return resp
 	}
 
-	comicInfo, err := search.Info(comicId, cacheDir)
+	comicInfo, err := search.ComicByComicId(comicId, cacheDir)
 	if err != nil {
 		resp.Code = -1
 		resp.Msg = err.Error()
+		return resp
 	}
 
 	resp.Data = comicInfo
+	return resp
+}
+
+func (d *DownloadApi) SearchComicByKeyword(keyword string, proxyUrl string) types.Response {
+	resp := types.Response{}
+
+	err := http_client.UpdateProxy(proxyUrl)
+	if err != nil {
+		resp.Code = -1
+		resp.Msg = err.Error()
+		return resp
+	}
+
+	result, err := search.ComicByKeyword(keyword)
+	if err != nil {
+		resp.Code = -1
+		resp.Msg = err.Error()
+		return resp
+	}
+
+	resp.Data = result
 	return resp
 }
 
@@ -45,13 +68,14 @@ func (d *DownloadApi) DownloadChapter(chapterUrl string, saveDir string, concurr
 	if err != nil {
 		resp.Code = -1
 		resp.Msg = err.Error()
-		return types.Response{}
+		return resp
 	}
 
 	err = download.ComicChapter(d.ctx, chapterUrl, saveDir, concurrentCount)
 	if err != nil {
 		resp.Code = -1
 		resp.Msg = err.Error()
+		return resp
 	}
 
 	return resp
@@ -59,4 +83,8 @@ func (d *DownloadApi) DownloadChapter(chapterUrl string, saveDir string, concurr
 
 func (d *DownloadApi) ComicInfoModel() search.ComicInfo {
 	return search.ComicInfo{}
+}
+
+func (d *DownloadApi) ComicSearchResultModel() search.ComicSearchResult {
+	return search.ComicSearchResult{}
 }

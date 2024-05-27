@@ -163,6 +163,22 @@ export namespace search {
 		    return a;
 		}
 	}
+	export class ComicSearchResult {
+	    title: string;
+	    authors: string[];
+	    comicId: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ComicSearchResult(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.title = source["title"];
+	        this.authors = source["authors"];
+	        this.comicId = source["comicId"];
+	    }
+	}
 
 }
 
@@ -171,7 +187,7 @@ export namespace types {
 	export class Response {
 	    code: number;
 	    msg: string;
-	    data?: any;
+	    data: any;
 	
 	    static createFrom(source: any = {}) {
 	        return new Response(source);

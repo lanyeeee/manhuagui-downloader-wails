@@ -11,7 +11,7 @@ const props = defineProps<{
   downloadTreeInst: TreeInst | null,
   downloadTreeOptions: TreeOption[],
   optionsToDownload: (TreeOption | null)[],
-  downloadProgresses: (InstanceType<typeof DownloadProgress>)[],
+  downloadProgressRefs: (InstanceType<typeof DownloadProgress>)[],
 }>()
 
 const searchDisabled = defineModel<boolean>("searchDisabled", {required: true})
@@ -51,8 +51,8 @@ async function downloadOptions() {
 
   await nextTick()
   let first = true
-  while (props.downloadProgresses.length > 0) {
-    const progress = props.downloadProgresses[0]
+  while (props.downloadProgressRefs.length > 0) {
+    const progress = props.downloadProgressRefs[0]
 
     if (!first) {
       await progress.wait()
