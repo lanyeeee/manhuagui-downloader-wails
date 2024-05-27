@@ -20,6 +20,7 @@ const createProgressPercentage = ref<number>(0)
 const mergeProgressIndicator = ref<string>("")
 const mergeProgressPercentage = ref<number>(0)
 
+// TODO: 修改获取要被导出的option的逻辑，目前的实现没法配合列表动态调整
 async function onExport() {
   const leafOptionsToExport = store.checkedExportTreeOptions
       ?.filter(option =>
@@ -154,7 +155,6 @@ async function exportNonLeafOptions(optionsToExport: TreeOption[]) {
                   :height="25"
                   indicator-placement="inside"
                   indicator-text-color="black"
-
       >{{ createProgressIndicator }}
       </n-progress>
     </div>
@@ -173,8 +173,8 @@ async function exportNonLeafOptions(optionsToExport: TreeOption[]) {
               @click="onExport"
               type="primary"
               :disabled="disabled"
-              :loading="buttonLoading">
-      导出
+              :loading="buttonLoading"
+    >导出
       <template #icon>
         <n-icon>
           <export-icon/>
