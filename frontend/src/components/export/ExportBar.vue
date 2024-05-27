@@ -73,15 +73,18 @@ async function onExport() {
       option.suffix = () => ExportStatus.WAITING
     })
 
-    await exportLeafOptions(leafOptionsToExport)
-    await exportNonLeafOptions(nonLeafOptionsToExport)
+    const createSuccess = await exportLeafOptions(leafOptionsToExport)
+    // 只有创建成功才会进行合并
+    if (createSuccess) {
+      await exportNonLeafOptions(nonLeafOptionsToExport)
+    }
   } finally {
     buttonLoading.value = false
     refreshDisabled.value = false
   }
 }
 
-async function exportLeafOptions(optionsToExport: TreeOption []) {
+async function exportLeafOptions(optionsToExport: TreeOption []): Promise<boolean> {
   const request = new export_pdf.CreatePdfsRequest({
     tasks: [],
     concurrentCount: store.exportConcurrentCount
@@ -104,21 +107,27 @@ async function exportLeafOptions(optionsToExport: TreeOption []) {
     request.tasks.push(task)
   }
 
-  EventsOn("create_pdf", (completedOptionKey: string, msg: string, percentage: number) => {
-    const completedOption = optionsToExport.find(option => option.key === completedOptionKey) as TreeOption | undefined
-    if (completedOption !== undefined) {
-      completedOption.suffix = () => ExportStatus.COMPLETED
-      completedOption.prefix = undefined
+  try {
+    EventsOn("create_pdf", (completedOptionKey: string, msg: string, percentage: number) => {
+      const completedOption = optionsToExport.find(option => option.key === completedOptionKey) as TreeOption | undefined
+      if (completedOption !== undefined) {
+        completedOption.suffix = () => ExportStatus.COMPLETED
+        completedOption.prefix = undefined
+      }
+      createProgressIndicator.value = msg
+      createProgressPercentage.value = percentage
+    })
+
+    const response = await CreatePdfs(request)
+    if (response.code != 0) {
+      notification.create({type: "error", title: "导出失败", content: "创建PDF文件失败", meta: response.msg,})
+      return false
     }
-    createProgressIndicator.value = msg
-    createProgressPercentage.value = percentage
-  })
-  console.log(request)
-  const response = await CreatePdfs(request)
-  if (response.code != 0) {
-    notification.create({type: "error", title: "导出失败", content: "创建PDF文件失败", meta: response.msg,})
+
+    return true
+  } finally {
+    EventsOff("create_pdf")
   }
-  EventsOff("create_pdf")
 }
 
 async function exportNonLeafOptions(optionsToExport: TreeOption[]) {
