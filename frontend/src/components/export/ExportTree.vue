@@ -27,6 +27,7 @@ const treeNodeClickBehaviour: TreeOverrideNodeClickBehavior = ({option}) => {
     <n-tree
         class="text-align-left"
         v-if="!showInfo"
+        virtual-scroll
         block-line
         show-line
         checkable

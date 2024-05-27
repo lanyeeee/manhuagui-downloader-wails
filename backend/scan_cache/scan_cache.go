@@ -11,6 +11,7 @@ import (
 	"strings"
 )
 
+// TODO: 修改逻辑，目前的实现太暴力了
 func ScanCacheDir(cacheDir string, exportDir string, maxDepth int64) ([]types.TreeNode, error) {
 	// 将路径中的反斜杠转换为正斜杠
 	cacheDir = filepath.ToSlash(cacheDir)
