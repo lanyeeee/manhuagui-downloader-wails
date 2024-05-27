@@ -18,6 +18,7 @@ const searchDisabled = defineModel<boolean>("searchDisabled", {required: true})
 
 const downloadButtonLoading = ref<boolean>(false)
 
+// TODO: 增加取消下载的功能
 async function onDownload() {
   if (props.optionsToDownload.length === 0) {
     notification.create({type: "error", title: "下载失败", content: "请选择要下载的章节", duration: 2000,})

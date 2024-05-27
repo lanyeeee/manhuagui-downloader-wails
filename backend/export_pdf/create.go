@@ -51,8 +51,7 @@ func CreatePdfs(ctx context.Context, request CreatePdfsRequest) error {
 	totalTaskCount := len(request.Tasks) // 总共需要创建的 PDF 数量
 	completedTaskCount := 0              // 已经成功创建的 PDF 数量
 	for result := range pdfResultCh {
-		// 某个任务创建 PDF 失败
-		// TODO: 应该处理完所有任务后才返回错误
+		// 某个任务创建 PDF 失败，返回错误
 		if result.err != nil {
 			return fmt.Errorf("create pdf failed: %w", result.err)
 		}
