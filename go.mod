@@ -8,6 +8,7 @@ require (
 	github.com/PuerkitoBio/goquery v1.9.2
 	github.com/daku10/go-lz-string v0.0.6
 	github.com/pdfcpu/pdfcpu v0.8.0
+	github.com/rapid7/go-get-proxied v0.0.0-20240311092404-798791728c56
 	github.com/wailsapp/wails/v2 v2.8.2
 	golang.org/x/net v0.25.0
 	golang.org/x/sync v0.7.0

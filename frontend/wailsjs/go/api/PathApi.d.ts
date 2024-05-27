@@ -13,5 +13,3 @@ export function MkDirAll(arg1:string):Promise<void>;
 export function PathExists(arg1:string):Promise<boolean>;
 
 export function Startup(arg1:context.Context):Promise<void>;
-
-export function UserDownloadPath():Promise<string>;

@@ -1,10 +1,10 @@
 import {defineStore} from "pinia"
 import * as path from "../../wailsjs/go/api/PathApi";
-import {GetCpuNum} from "../../wailsjs/go/api/UtilsApi";
+import {GetCpuNum, GetUserDownloadPath, GetUserProxy} from "../../wailsjs/go/api/UtilsApi";
 
 export const useDownloaderStore = defineStore('downloader', {
     state: () => ({
-        proxyUrl: "http://127.0.0.1:7890",
+        proxyUrl: "",
         downloadConcurrentCount: 3,
         exportConcurrentCount: 1,
         cacheDirectory: "",
@@ -16,7 +16,9 @@ export const useDownloaderStore = defineStore('downloader', {
     actions: {
         async init() {
             try {
-                const userDownloadPath = await path.UserDownloadPath()
+                this.proxyUrl = await GetUserProxy()
+
+                const userDownloadPath = await GetUserDownloadPath()
                 const exportDirectory = await path.Join([userDownloadPath, "漫画导出"])
                 if (!await path.PathExists(exportDirectory)) {
                     await path.MkDirAll(exportDirectory)

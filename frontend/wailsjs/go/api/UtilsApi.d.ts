@@ -4,4 +4,8 @@ import {context} from '../models';
 
 export function GetCpuNum():Promise<number>;
 
+export function GetUserDownloadPath():Promise<string>;
+
+export function GetUserProxy():Promise<string>;
+
 export function Startup(arg1:context.Context):Promise<void>;
