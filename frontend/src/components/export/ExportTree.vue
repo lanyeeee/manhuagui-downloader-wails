@@ -1,15 +1,18 @@
 <script lang="ts" setup>
-import {NTree, TreeInst, TreeOverrideNodeClickBehavior} from "naive-ui"
-import {computed, ref, watch} from "vue"
-import {useDownloaderStore} from "../../stores/downloader"
+import {NTree, TreeInst, TreeOption, TreeOverrideNodeClickBehavior} from "naive-ui"
+import {computed, defineModel, ref, watch} from "vue"
 
 
-const store = useDownloaderStore()
+const exportTreeInst = defineModel<TreeInst | null>("exportTreeInst", {required: true});
+const exportTreeOptions = defineModel<TreeOption[]>("exportTreeOptions", {required: true});
+const exportDefaultExpandKeys = defineModel<string[]>("exportDefaultExpandKeys", {required: true});
+const exportDefaultCheckedKeys = defineModel<string[]>("exportDefaultCheckedKeys", {required: true});
 
-const showInfo = computed<boolean>(() => store.exportTreeOptions.length === 0)
+// TODO: 换成<"empty", "tree">的联合类型
+const showInfo = computed<boolean>(() => exportTreeOptions.value.length === 0)
 const treeRef = ref<TreeInst | null>(null)
 watch(treeRef, () => {
-  store.exportTreeInst = treeRef.value
+  exportTreeInst.value = treeRef.value
 })
 
 const treeNodeClickBehaviour: TreeOverrideNodeClickBehavior = ({option}) => {
@@ -32,9 +35,9 @@ const treeNodeClickBehaviour: TreeOverrideNodeClickBehavior = ({option}) => {
         show-line
         checkable
         cascade
-        :data="store.exportTreeOptions"
-        :default-expanded-keys="store.exportDefaultExpandKeys"
-        :default-checked-keys="store.exportDefaultCheckedKeys"
+        :data="exportTreeOptions"
+        :default-expanded-keys="exportDefaultExpandKeys"
+        :default-checked-keys="exportDefaultCheckedKeys"
         :override-default-node-click-behavior="treeNodeClickBehaviour"
         ref="treeRef"
     />

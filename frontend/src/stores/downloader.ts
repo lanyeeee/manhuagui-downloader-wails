@@ -1,17 +1,9 @@
 import {defineStore} from "pinia"
-import {TreeInst, TreeOption} from "naive-ui";
 import * as path from "../../wailsjs/go/api/PathApi";
 import {GetCpuNum} from "../../wailsjs/go/api/UtilsApi";
 
 export const useDownloaderStore = defineStore('downloader', {
     state: () => ({
-        exportTreeInst: null as TreeInst | null,
-        exportTreeOptions: [] as TreeOption[],
-        exportDefaultExpandKeys: [] as string[],
-        exportDefaultCheckedKeys: [] as string[],
-
-        refreshDisabled: false,
-
         proxyUrl: "http://127.0.0.1:7890",
         downloadConcurrentCount: 3,
         exportConcurrentCount: 1,
@@ -20,11 +12,7 @@ export const useDownloaderStore = defineStore('downloader', {
         downloadInterval: 10,
         exportTreeMaxDepth: 3,
     }),
-    getters: {
-        checkedExportTreeOptions(state): (TreeOption | null)[] | undefined {
-            return state.exportTreeInst?.getCheckedData().options
-        },
-    },
+    getters: {},
     actions: {
         async init() {
             try {

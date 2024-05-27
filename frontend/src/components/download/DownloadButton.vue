@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {NButton, TreeInst, TreeOption, useNotification} from "naive-ui"
-import {computed, defineModel, defineProps, nextTick, ref} from "vue"
+import {defineModel, defineProps, nextTick, ref} from "vue"
 import {DownloadOutline as DownloadIcon} from "@vicons/ionicons5"
 import {DownloadStatus} from "../../constants/download-constant"
 import DownloadProgress from "./DownloadProgress.vue";
@@ -16,7 +16,6 @@ const props = defineProps<{
 
 const searchDisabled = defineModel<boolean>("searchDisabled", {required: true})
 
-const downloadButtonDisabled = computed<boolean>(() => props.downloadTreeOptions?.length === 0)
 const downloadButtonLoading = ref<boolean>(false)
 
 async function onDownload() {
@@ -33,11 +32,6 @@ async function onDownload() {
     searchDisabled.value = false
     downloadButtonLoading.value = false
   }
-}
-
-//TODO: 支持取消下载
-async function onCancel() {
-  console.log("cancel")
 }
 
 async function downloadOptions() {
@@ -69,7 +63,6 @@ async function downloadOptions() {
 
 <template>
   <n-button @click="onDownload" type="primary"
-            :disabled="downloadButtonDisabled"
             :loading="downloadButtonLoading">
     开始下载
     <template #icon>

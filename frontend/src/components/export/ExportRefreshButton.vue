@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {RefreshOutline as RefreshIcon} from "@vicons/ionicons5";
-import {ref, watch} from "vue";
+import {defineModel, ref, watch} from "vue";
 import {useDownloaderStore} from "../../stores/downloader";
 import {types} from "../../../wailsjs/go/models";
 import {ScanCacheDir} from "../../../wailsjs/go/api/ExportApi";
@@ -8,10 +8,17 @@ import {TreeOption, useNotification} from "naive-ui";
 import {ExportStatus} from "../../constants/export-constant";
 
 const notification = useNotification()
-
-const loading = ref<boolean>(false)
 const store = useDownloaderStore()
 
+const props = defineProps<{
+  refreshDisabled: boolean,
+}>()
+
+const exportTreeOptions = defineModel<TreeOption[]>("exportTreeOptions", {required: true});
+const exportDefaultExpandKeys = defineModel<string[]>("exportDefaultExpandKeys", {required: true});
+const exportDefaultCheckedKeys = defineModel<string[]>("exportDefaultCheckedKeys", {required: true});
+
+const loading = ref<boolean>(false)
 watch(() => store.cacheDirectory, onRefresh)
 
 
@@ -24,11 +31,11 @@ async function buildOptionTree(node: types.TreeNode) {
     children: []
   }
   if (node.defaultChecked) {
-    store.exportDefaultCheckedKeys.push(node.key)
+    exportDefaultCheckedKeys.value.push(node.key)
     nodeOption.suffix = () => ExportStatus.COMPLETED
   }
   if (node.defaultExpand) {
-    store.exportDefaultExpandKeys.push(node.key)
+    exportDefaultExpandKeys.value.push(node.key)
   }
 
   for (const child of node.children) {
@@ -51,15 +58,15 @@ async function onRefresh() {
 
     const roots: types.TreeNode[] = response.data
     // 清空原有的数据
-    const exportTreeOptions: TreeOption[] = []
-    store.exportDefaultCheckedKeys.length = 0
-    store.exportDefaultExpandKeys.length = 0
+    const options: TreeOption[] = []
+    exportDefaultCheckedKeys.value.length = 0
+    exportDefaultExpandKeys.value.length = 0
     for (const root of roots) {
       const rootOption = await buildOptionTree(root)
-      exportTreeOptions.push(rootOption)
+      options.push(rootOption)
     }
 
-    store.exportTreeOptions = exportTreeOptions
+    exportTreeOptions.value = options
   } catch (e) {
     console.error(e)
     if (typeof e === "string") {
@@ -83,7 +90,7 @@ async function onRefresh() {
               type="primary"
               secondary
               :loading="loading"
-              :disabled="store.refreshDisabled">
+              :disabled="refreshDisabled">
       重新扫描
       <template #icon>
         <n-icon>
