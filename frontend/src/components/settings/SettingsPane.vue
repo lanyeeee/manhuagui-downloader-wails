@@ -13,7 +13,7 @@ onMounted(async () => {
   maxExportConcurrentCount.value = await GetCpuNum()
 })
 
-
+//TODO: 优化设置界面
 </script>
 
 <template>
