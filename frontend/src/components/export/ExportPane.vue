@@ -4,7 +4,7 @@ import ExportBar from "./ExportBar.vue";
 import ExportRefreshButton from "./ExportRefreshButton.vue";
 import CacheDirectoryInput from "../settings/CacheDirectoryInput.vue";
 import {TreeInst, TreeOption} from "naive-ui";
-import {ref} from "vue"
+import {computed, ref} from "vue"
 
 
 const exportTreeInst = ref<TreeInst | null>(null)
@@ -12,6 +12,8 @@ const exportTreeOptions = ref<TreeOption[]>([])
 const exportDefaultExpandKeys = ref<string[]>([])
 const exportDefaultCheckedKeys = ref<string[]>([])
 const refreshDisabled = ref<boolean>(false)
+
+const showExportTree = computed<boolean>(() => exportTreeOptions.value.length !== 0)
 
 </script>
 
@@ -26,7 +28,9 @@ const refreshDisabled = ref<boolean>(false)
                                v-model:export-default-checked-keys="exportDefaultCheckedKeys"
         />
       </div>
-      <export-tree v-model:export-tree-inst="exportTreeInst"
+      <n-result v-if="!showExportTree" title="缓存目录为空"/>
+      <export-tree v-else
+                   v-model:export-tree-inst="exportTreeInst"
                    v-model:export-tree-options="exportTreeOptions"
                    v-model:export-default-expand-keys="exportDefaultExpandKeys"
                    v-model:export-default-checked-keys="exportDefaultCheckedKeys"
