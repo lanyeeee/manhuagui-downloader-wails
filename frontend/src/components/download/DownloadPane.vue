@@ -42,6 +42,7 @@ const optionDownloading = computed<(TreeOption | null)[]>(() => downloadTreeInst
     ?? [])
 
 
+// TODO: 搜索列表支持翻页
 </script>
 
 <template>
@@ -52,7 +53,7 @@ const optionDownloading = computed<(TreeOption | null)[]>(() => downloadTreeInst
                            v-model:download-default-expand-keys="downloadDefaultExpandKeys"
                            v-model:download-default-checked-keys="downloadDefaultCheckedKeys"
                            v-model:search-by-keyword-result="searchByKeyWordResult"
-                            v-model:search-result-type="searchResultType"
+                           v-model:search-result-type="searchResultType"
                            ref="downloadSearchBarRef"
       />
       <n-result v-if="searchResultType == 'empty'" title="请搜索漫画"/>
@@ -63,7 +64,8 @@ const optionDownloading = computed<(TreeOption | null)[]>(() => downloadTreeInst
                      v-model:download-default-expand-keys="downloadDefaultExpandKeys"
                      v-model:download-default-checked-keys="downloadDefaultCheckedKeys"
       />
-      <download-search-list v-else-if="searchResultType == 'list'"
+      <download-search-list class="pt-2"
+                            v-else-if="searchResultType == 'list'"
                             :search-by-keyword-result="searchByKeyWordResult"
                             :download-search-bar-ref="downloadSearchBarRef"
       />
