@@ -69,7 +69,7 @@ onMounted(async () => {
           </template>
         </n-input-number>
       </template>
-      <span>此参数用于限制导出树最大深度，防止扫描缓存目录的时间过长</span>
+      <span><b>(如果你完全看不懂这个参数的描述，请使用默认值 3)</b><br/>此参数用于限制导出页面中文件树的最大深度，防止扫描缓存目录的时间过长<br/>例如选择C盘根目录作为缓存目录，如果不对深度加以限制，则会扫描整个C盘下的所有文件</span>
     </n-popover>
   </div>
 </template>
