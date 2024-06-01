@@ -2,7 +2,7 @@
 
 一个用于 manhuagui.com 看漫画 漫画柜 的下载器
 
-在[Release页面](https://github.com/lanyeeee/manhuagui-downloader/releases)可以直接下载，带图形界面，支持导出PDF，免安装版(portable)解压后可以直接运行，**建议下载安装版，免安装版容易被杀毒软件误判为病毒**
+在[Release页面](https://github.com/lanyeeee/manhuagui-downloader/releases)可以直接下载，带图形界面，支持下载隐藏内容、导出PDF，免安装版(portable)解压后可以直接运行，**建议下载安装版，免安装版容易被杀毒软件误判为病毒**
 
 # 图形界面
 
