@@ -1,9 +1,15 @@
 <script setup lang="ts">
 import {NButton, TreeInst, TreeOption, useNotification} from "naive-ui"
 import {defineModel, defineProps, nextTick, ref} from "vue"
-import {DownloadOutline as DownloadIcon} from "@vicons/ionicons5"
-import {DownloadStatus} from "../../constants/download-constant"
+import {DownloadOutline as DownloadIcon, PauseOutline as CancelIcon} from "@vicons/ionicons5"
 import DownloadProgress from "./DownloadProgress.vue";
+import {DownloadStatus} from "../../constants/download-constant";
+
+enum DownloadButtonStatus {
+  WAITING,
+  DOWNLOADING,
+  CANCELING,
+}
 
 const notification = useNotification()
 
@@ -15,10 +21,9 @@ const props = defineProps<{
 }>()
 
 const searchDisabled = defineModel<boolean>("searchDisabled", {required: true})
+const downloadButtonStatus = ref<DownloadButtonStatus>(DownloadButtonStatus.WAITING)
 
-const downloadButtonLoading = ref<boolean>(false)
 
-// TODO: 增加取消下载的功能
 async function onDownload() {
   if (props.optionsToDownload.length === 0) {
     notification.create({type: "error", title: "下载失败", content: "请选择要下载的章节", duration: 2000,})
@@ -27,11 +32,11 @@ async function onDownload() {
 
   try {
     searchDisabled.value = true
-    downloadButtonLoading.value = true
+    downloadButtonStatus.value = DownloadButtonStatus.DOWNLOADING
     await downloadOptions()
   } finally {
     searchDisabled.value = false
-    downloadButtonLoading.value = false
+    downloadButtonStatus.value = DownloadButtonStatus.WAITING
   }
 }
 
@@ -46,7 +51,7 @@ async function downloadOptions() {
 
   await nextTick()
   let first = true
-  while (props.downloadProgressRefs.length > 0) {
+  while (props.downloadProgressRefs.length > 0 && downloadButtonStatus.value === DownloadButtonStatus.DOWNLOADING) {
     const progress = props.downloadProgressRefs[0]
 
     if (!first) {
@@ -58,13 +63,22 @@ async function downloadOptions() {
     await progress.download()
   }
 
+  // 把没有下载完成的option重新enable
+  props.optionsToDownload.forEach(option => {
+    if (option !== null) {
+      option.disabled = false
+      option.suffix = () => undefined
+    }
+  })
+
 }
 
 </script>
 
 <template>
-  <n-button @click="onDownload" type="primary"
-            :loading="downloadButtonLoading">
+  <n-button v-if="downloadButtonStatus == DownloadButtonStatus.WAITING"
+            @click="onDownload"
+            type="primary">
     开始下载
     <template #icon>
       <n-icon>
@@ -72,5 +86,22 @@ async function downloadOptions() {
       </n-icon>
     </template>
   </n-button>
+  <n-button v-else-if="downloadButtonStatus == DownloadButtonStatus.DOWNLOADING"
+            @click="downloadButtonStatus = DownloadButtonStatus.CANCELING"
+            type="error">
+    取消下载
+    <template #icon>
+      <n-icon>
+        <cancel-icon/>
+      </n-icon>
+    </template>
+  </n-button>
+  <n-button v-else-if="downloadButtonStatus == DownloadButtonStatus.CANCELING"
+            type="error"
+            loading>
+    将在本章节下载完成后取消
+  </n-button>
+
+
 </template>
 
