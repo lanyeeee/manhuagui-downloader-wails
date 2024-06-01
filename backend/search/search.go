@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
+	lzstring "github.com/daku10/go-lz-string"
 	"io"
 	"manhuagui-downloader/backend/http_client"
 	"manhuagui-downloader/backend/types"
@@ -47,7 +48,6 @@ type ComicSearchResult struct {
 	ComicId string   `json:"comicId"`
 }
 
-// TODO: 支持隐藏内容下载
 func ComicByComicId(comicId string, cacheDir string) (types.TreeNode, error) {
 	resp, err := http_client.HttpClientInst().Get("https://www.manhuagui.com/comic/" + comicId)
 	if err != nil {
@@ -77,6 +77,25 @@ func ComicByComicId(comicId string, cacheDir string) (types.TreeNode, error) {
 	title, err := getTitle(doc)
 	if err != nil {
 		return types.TreeNode{}, fmt.Errorf("get title failed: %w", err)
+	}
+	warningBar := doc.Find("div[class=warning-bar]")
+	// 如果是带警告的漫画
+	if warningBar.Length() > 0 {
+		// 获取id为__VIEWSTATE的input标签的value属性
+		val, exists := doc.Find("input[id=__VIEWSTATE]").First().Attr("value")
+		if !exists {
+			return types.TreeNode{}, errors.New("can't find __VIEWSTATE")
+		}
+		// 解码得到隐藏的html内容
+		hiddenContent, err := lzstring.DecompressFromBase64(val)
+		if err != nil {
+			return types.TreeNode{}, fmt.Errorf("decompress __VIEWSTATE failed: %w", err)
+		}
+		// 重新解析隐藏的html内容
+		doc, err = goquery.NewDocumentFromReader(strings.NewReader(hiddenContent))
+		if err != nil {
+			return types.TreeNode{}, fmt.Errorf("parse hidden html failed: %w", err)
+		}
 	}
 
 	chapterTypes, err := getChapterTypes(doc)
@@ -155,9 +174,8 @@ func getTitle(doc *goquery.Document) (string, error) {
 
 func getChapterTypes(doc *goquery.Document) ([]ChapterType, error) {
 	var chapterTypes []ChapterType
-	chapterDiv := doc.Find("div[class~=chapter]")
 
-	chapterDiv.Find("h4").Each(func(i int, h4 *goquery.Selection) {
+	doc.Find("h4").Each(func(i int, h4 *goquery.Selection) {
 		chapterType := ChapterType{Title: h4.Find("span").Text()}
 
 		// class中包含chapter-page的div表示这个章节类型有分页
