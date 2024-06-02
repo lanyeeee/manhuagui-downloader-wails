@@ -26,6 +26,12 @@
 
 ![image-20240519005528352](md/settings.png)
 
+# 关于被杀毒软件误判为病毒
+
+这个问题几乎是无解的，我能想到的解决办法只有：
+1. 根据下面的**如何构建(build)**，自行编译
+2. 希望你相信我的承诺，我承诺你在[Release页面](https://github.com/lanyeeee/manhuagui-downloader/releases)下载到的所有东西都是安全的
+
 # 如何构建(build)
 
 如果你是普通用户请忽略这部分内容
