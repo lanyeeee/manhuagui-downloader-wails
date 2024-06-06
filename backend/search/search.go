@@ -17,31 +17,37 @@ import (
 	"strings"
 )
 
+// ComicInfo 漫画信息，包含 漫画标题 和 章节类型(单话、单行本、番外)
 type ComicInfo struct {
 	Title        string        `json:"title"`
 	ChapterTypes []ChapterType `json:"chapterTypes"`
 }
 
+// ChapterType 章节类型，包含 章节类型标题 和 章节分页(第1-10页、第11-20页)
 type ChapterType struct {
 	Title        string        `json:"title"`
 	ChapterPages []ChapterPage `json:"chapterPages"`
 }
 
+// ChapterPage 分页信息，包含分页标题(第1-10页、第11-20页) 和 章节列表
 type ChapterPage struct {
 	Title    string    `json:"title"`
 	Chapters []Chapter `json:"chapters"`
 }
 
+// Chapter 章节信息，包含 章节标题 和 章节链接
 type Chapter struct {
 	Title string `json:"title"`
 	Href  string `json:"href"`
 }
 
+// ChapterTreeNodeKey 章节树节点的Key，包含 章节链接 和 保存目录
 type ChapterTreeNodeKey struct {
 	Href    string `json:"href"`
 	SaveDir string `json:"saveDir"`
 }
 
+// ComicSearchResult 漫画搜索结果，包含 漫画标题、作者 和 漫画ID
 type ComicSearchResult struct {
 	Title   string   `json:"title"`
 	Authors []string `json:"authors"`
