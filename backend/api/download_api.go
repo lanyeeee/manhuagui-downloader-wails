@@ -41,7 +41,7 @@ func (d *DownloadApi) SearchComicById(comicId string, proxyUrl string, cacheDir 
 	return resp
 }
 
-func (d *DownloadApi) SearchComicByKeyword(keyword string, proxyUrl string) types.Response {
+func (d *DownloadApi) SearchComicByKeyword(keyword string, pageNum int, proxyUrl string) types.Response {
 	resp := types.Response{}
 
 	err := http_client.UpdateProxy(proxyUrl)
@@ -51,7 +51,7 @@ func (d *DownloadApi) SearchComicByKeyword(keyword string, proxyUrl string) type
 		return resp
 	}
 
-	result, err := search.ComicByKeyword(keyword)
+	result, err := search.ComicByKeyword(keyword, pageNum)
 	if err != nil {
 		resp.Code = -1
 		resp.Msg = err.Error()
@@ -83,6 +83,10 @@ func (d *DownloadApi) DownloadChapter(chapterUrl string, saveDir string, concurr
 
 func (d *DownloadApi) ComicInfoModel() search.ComicInfo {
 	return search.ComicInfo{}
+}
+
+func (d *DownloadApi) ComicSearchInfoModel() search.ComicSearchInfo {
+	return search.ComicSearchInfo{}
 }
 
 func (d *DownloadApi) ComicSearchResultModel() search.ComicSearchResult {

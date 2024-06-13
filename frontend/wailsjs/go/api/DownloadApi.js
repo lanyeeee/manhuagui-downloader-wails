@@ -6,6 +6,10 @@ export function ComicInfoModel() {
   return window['go']['api']['DownloadApi']['ComicInfoModel']();
 }
 
+export function ComicSearchInfoModel() {
+  return window['go']['api']['DownloadApi']['ComicSearchInfoModel']();
+}
+
 export function ComicSearchResultModel() {
   return window['go']['api']['DownloadApi']['ComicSearchResultModel']();
 }
@@ -18,8 +22,8 @@ export function SearchComicById(arg1, arg2, arg3) {
   return window['go']['api']['DownloadApi']['SearchComicById'](arg1, arg2, arg3);
 }
 
-export function SearchComicByKeyword(arg1, arg2) {
-  return window['go']['api']['DownloadApi']['SearchComicByKeyword'](arg1, arg2);
+export function SearchComicByKeyword(arg1, arg2, arg3) {
+  return window['go']['api']['DownloadApi']['SearchComicByKeyword'](arg1, arg2, arg3);
 }
 
 export function Startup(arg1) {
