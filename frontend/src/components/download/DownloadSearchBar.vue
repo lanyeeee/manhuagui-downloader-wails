@@ -28,7 +28,7 @@ const props = defineProps<{
   disabled: boolean
 }>()
 
-const searchByKeywordResult = defineModel<ComicSearchResult[]>("searchByKeywordResult", {required: true})
+const searchByKeywordResult = defineModel<ComicSearchResult>("searchByKeywordResult", {required: true})
 
 function buildOptionTree(node: types.TreeNode): TreeOption {
   const nodeOption: TreeOption = {
@@ -55,7 +55,7 @@ function buildOptionTree(node: types.TreeNode): TreeOption {
   return nodeOption
 }
 
-async function searchByKeyword(keyword: string) {
+async function searchByKeyword(keyword: string, pageNumber: number = 1) {
   if (props.disabled || searchByKeywordButtonDisabled.value) {
     return
   }
@@ -63,13 +63,13 @@ async function searchByKeyword(keyword: string) {
   try {
     searchByKeywordButtonLoading.value = true
     searchByIdButtonDisabled.value = true
-    const response = await SearchComicByKeyword(keyword, store.proxyUrl)
+    const response = await SearchComicByKeyword(keyword, pageNumber, store.proxyUrl)
     if (response.code != 0) {
       notification.create({type: "error", title: "搜索失败", meta: response.msg,})
       return
     }
 
-    const searchResult: ComicSearchResult[] = response.data ?? []
+    const searchResult: ComicSearchResult = response.data ?? []
     console.log("搜索结果", searchResult)
     searchByKeywordResult.value = searchResult
     searchResultType.value = "list"
@@ -130,7 +130,9 @@ function extractComicIdFrom(input: string): string | null {
 }
 
 defineExpose({
-  searchById
+  searchById,
+  searchByKeyword,
+  searchByKeywordInput
 })
 
 </script>
@@ -189,5 +191,3 @@ defineExpose({
     </div>
   </div>
 </template>
-
-

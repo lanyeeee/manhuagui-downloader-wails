@@ -163,13 +163,13 @@ export namespace search {
 		    return a;
 		}
 	}
-	export class ComicSearchResult {
+	export class ComicSearchInfo {
 	    title: string;
 	    authors: string[];
 	    comicId: string;
 	
 	    static createFrom(source: any = {}) {
-	        return new ComicSearchResult(source);
+	        return new ComicSearchInfo(source);
 	    }
 	
 	    constructor(source: any = {}) {
@@ -178,6 +178,40 @@ export namespace search {
 	        this.authors = source["authors"];
 	        this.comicId = source["comicId"];
 	    }
+	}
+	export class ComicSearchResult {
+	    infos: ComicSearchInfo[];
+	    currentPage: number;
+	    totalPage: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new ComicSearchResult(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.infos = this.convertValues(source["infos"], ComicSearchInfo);
+	        this.currentPage = source["currentPage"];
+	        this.totalPage = source["totalPage"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
 	}
 
 }

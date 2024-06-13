@@ -22,7 +22,7 @@ const searchDisabled = ref<boolean>(false);
 const searchResultType = ref<"empty" | "tree" | "list">("empty")
 
 const downloadSearchBarRef = ref<InstanceType<typeof DownloadSearchBar> | null>(null);
-const searchByKeyWordResult = ref<ComicSearchResult[]>([]);
+const searchByKeyWordResult = ref<ComicSearchResult>(new ComicSearchResult());
 
 const optionToDownload = computed<(TreeOption | null)[]>(() => downloadTreeInst
         .value
@@ -42,7 +42,6 @@ const optionDownloading = computed<(TreeOption | null)[]>(() => downloadTreeInst
     ?? [])
 
 
-// TODO: 搜索列表支持翻页
 </script>
 
 <template>
@@ -80,4 +79,3 @@ const optionDownloading = computed<(TreeOption | null)[]>(() => downloadTreeInst
     </div>
   </div>
 </template>
-

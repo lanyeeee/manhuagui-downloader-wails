@@ -14,6 +14,7 @@ import (
 	"path"
 	"path/filepath"
 	"slices"
+	"strconv"
 	"strings"
 )
 
@@ -47,11 +48,17 @@ type ChapterTreeNodeKey struct {
 	SaveDir string `json:"saveDir"`
 }
 
-// ComicSearchResult 漫画搜索结果，包含 漫画标题、作者 和 漫画ID
-type ComicSearchResult struct {
+// ComicSearchInfo 漫画搜索信息，包含 漫画标题、作者 和 漫画ID
+type ComicSearchInfo struct {
 	Title   string   `json:"title"`
 	Authors []string `json:"authors"`
 	ComicId string   `json:"comicId"`
+}
+
+type ComicSearchResult struct {
+	Infos       []ComicSearchInfo `json:"infos"`
+	CurrentPage int               `json:"currentPage"`
+	TotalPage   int               `json:"totalPage"`
 }
 
 func ComicByComicId(comicId string, cacheDir string) (types.TreeNode, error) {
@@ -122,36 +129,44 @@ func ComicByComicId(comicId string, cacheDir string) (types.TreeNode, error) {
 	return root, nil
 }
 
-func ComicByKeyword(keyword string) ([]ComicSearchResult, error) {
-	resp, err := http_client.HttpClientInst().Get(fmt.Sprintf("https://www.manhuagui.com/s/%s.html", keyword))
+func ComicByKeyword(keyword string, pageNum int) (ComicSearchResult, error) {
+	// 根据keyword和pageNum构造搜索url
+	searchUrl := fmt.Sprintf("https://www.manhuagui.com/s/%s_p%d.html", keyword, pageNum)
+	resp, err := http_client.HttpClientInst().Get(searchUrl)
 	if err != nil {
-		return []ComicSearchResult{}, fmt.Errorf("do request failed: %w", err)
+		return ComicSearchResult{}, fmt.Errorf("do request failed: %w", err)
 	}
 	defer func(Body io.ReadCloser) { _ = Body.Close() }(resp.Body)
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return []ComicSearchResult{}, fmt.Errorf("read response body failed: %w", err)
+		return ComicSearchResult{}, fmt.Errorf("read response body failed: %w", err)
 	}
-
+	// 将html内容转换为goquery.Document
 	htmlContent := string(respBody)
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlContent))
 	if err != nil {
-		return []ComicSearchResult{}, fmt.Errorf("parse html failed: %w", err)
+		return ComicSearchResult{}, fmt.Errorf("parse html failed: %w", err)
 	}
-
-	var results []ComicSearchResult
+	// 构造搜索结果
+	var result ComicSearchResult
+	// 获取当前页和总页数
+	result.CurrentPage, result.TotalPage, err = getCurrentPageAndTotalPage(doc)
+	if err != nil {
+		return ComicSearchResult{}, fmt.Errorf("get current page and last page failed: %w", err)
+	}
+	// 获取每部漫画的搜索信息
 	doc.Find(".book-detail").Each(func(_ int, div *goquery.Selection) {
-		var result ComicSearchResult
+		var info ComicSearchInfo
 		// 获取书名和漫画ID
 		a := div.Find("dt a").First()
 		title, titleExists := a.Attr("title")
 		if titleExists {
-			result.Title = title
+			info.Title = title
 		}
 		href, hrefExists := a.Attr("href")
 		if hrefExists {
 			parts := strings.Split(href, "/")
-			result.ComicId = parts[2]
+			info.ComicId = parts[2]
 		}
 
 		// 获取作者名
@@ -164,13 +179,38 @@ func ComicByKeyword(keyword string) ([]ComicSearchResult, error) {
 
 			author, authorExist := s.Attr("title")
 			if authorExist {
-				result.Authors = append(result.Authors, author)
+				info.Authors = append(info.Authors, author)
 			}
 		})
 
-		results = append(results, result)
+		result.Infos = append(result.Infos, info)
 	})
-	return results, nil
+	return result, nil
+}
+
+func getCurrentPageAndTotalPage(doc *goquery.Document) (int, int, error) {
+	// 获取总结果数
+	totalResultText := doc.Find("div.result-count strong").Eq(1).Text()
+	totalResult, err := strconv.Atoi(totalResultText)
+	if err != nil {
+		return 0, 0, fmt.Errorf("convert total result count failed: %w", err)
+	}
+	// 如果没有结果
+	if totalResult == 0 {
+		return 0, 0, nil
+	}
+	// 找到当前页
+	currentPage, err := strconv.Atoi(doc.Find("span.current").Text())
+	if err != nil {
+		return 0, 0, fmt.Errorf("convert current page failed: %w", err)
+	}
+	// 计算总页数
+	totalPage := totalResult / 10
+	if totalResult%10 != 0 {
+		totalPage++
+	}
+
+	return currentPage, totalPage, nil
 }
 
 func getTitle(doc *goquery.Document) (string, error) {
