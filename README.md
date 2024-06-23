@@ -42,24 +42,28 @@
 - [Go 1.18+](https://go.dev/dl/)
 - [NPM (Node 15+)](https://nodejs.org/en)
 
-### 安装Wails
+### 步骤
+
+#### 1. 安装Wails
 
 ```
 go install github.com/wailsapp/wails/v2/cmd/wails@latest
 ```
 
-### 克隆本仓库
+#### 2. 克隆本仓库
 
 ```
 git clone https://github.com/lanyeeee/manhuagui-downloader.git
 ```
 
-### 构建(build)
+#### 3. 构建(build)
 
 ```
 cd manhuagui-downloader
 wails build
 ```
+# 其他
+任何使用中遇到的问题、任何希望添加的功能，都欢迎提issue，我会尽力解决  
 
 # License 许可证
 
