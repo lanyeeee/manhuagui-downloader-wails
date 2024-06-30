@@ -3,15 +3,15 @@ import {useDownloaderStore} from "../../stores/downloader";
 import {ChooseDirectory} from "../../../wailsjs/go/api/SettingsApi";
 import {useNotification} from "naive-ui";
 
-const store = useDownloaderStore()
-const notification = useNotification()
+const store = useDownloaderStore();
+const notification = useNotification();
 
 async function onChooseExportDirectory() {
-  const response = await ChooseDirectory(store.exportDirectory)
+  const response = await ChooseDirectory(store.exportDirectory);
   if (response.code != 0) {
-    notification.create({type: "error", title: "选择导出目录失败", meta: response.msg,})
+    notification.create({type: "error", title: "选择导出目录失败", meta: response.msg,});
   } else if (response.data !== "") {
-    store.exportDirectory = response.data as string
+    store.exportDirectory = response.data as string;
   }
 }
 </script>

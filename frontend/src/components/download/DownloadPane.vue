@@ -10,16 +10,16 @@ import {search} from "../../../wailsjs/go/models";
 import DownloadSearchList from "./DownloadSearchList.vue";
 import ComicSearchResult = search.ComicSearchResult;
 
-const store = useDownloaderStore()
+const store = useDownloaderStore();
 
 const downloadTreeInst = ref<TreeInst | null>(null);
 const downloadTreeOptions = ref<TreeOption[]>([]);
 const downloadDefaultExpandKeys = ref<string[]>([]);
 const downloadDefaultCheckedKeys = ref<string[]>([]);
-watch(() => store.cacheDirectory, () => downloadTreeOptions.value = [])
+watch(() => store.cacheDirectory, () => downloadTreeOptions.value = []);
 
 const searchDisabled = ref<boolean>(false);
-const searchResultType = ref<"empty" | "tree" | "list">("empty")
+const searchResultType = ref<"empty" | "tree" | "list">("empty");
 
 const downloadSearchBarRef = ref<InstanceType<typeof DownloadSearchBar> | null>(null);
 const searchByKeyWordResult = ref<ComicSearchResult>(new ComicSearchResult());
@@ -30,7 +30,7 @@ const optionToDownload = computed<(TreeOption | null)[]>(() => downloadTreeInst
         .options
         // 所有状态不是已完成的叶子节点就是要下载的
         .filter(option => option !== null && option.isLeaf && (option.suffix === undefined || option.suffix() !== DownloadStatus.COMPLETED))
-    ?? [])
+    ?? []);
 const optionDownloading = computed<(TreeOption | null)[]>(() => downloadTreeInst
         .value
         ?.getCheckedData()
@@ -39,7 +39,7 @@ const optionDownloading = computed<(TreeOption | null)[]>(() => downloadTreeInst
             && option.isLeaf
             && option.suffix !== undefined
             && (option.suffix() === DownloadStatus.WAITING || option.suffix() === DownloadStatus.DOWNLOADING))
-    ?? [])
+    ?? []);
 
 
 </script>

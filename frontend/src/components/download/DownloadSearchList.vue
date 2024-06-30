@@ -1,32 +1,32 @@
 <script setup lang="ts">
-import {defineProps, ref} from "vue"
+import {defineProps, ref} from "vue";
 import DownloadSearchBar from "./DownloadSearchBar.vue";
 import {search} from "../../../wailsjs/go/models";
 import ComicSearchResult = search.ComicSearchResult;
 
-const paginationDisabled = ref<boolean>(false)
+const paginationDisabled = ref<boolean>(false);
 
 const props = defineProps<{
   downloadSearchBarRef: InstanceType<typeof DownloadSearchBar> | null
   searchByKeywordResult: ComicSearchResult,
-}>()
+}>();
 
 async function onSelectItem(comic: string) {
   if (props.downloadSearchBarRef === null || props.searchByKeywordResult === undefined) {
-    return
+    return;
   }
 
-  await props.downloadSearchBarRef.searchById(comic)
+  await props.downloadSearchBarRef.searchById(comic);
 }
 
 async function onPageChange(pageNumber: number) {
   if (props.downloadSearchBarRef === null) {
-    return
+    return;
   }
 
-  paginationDisabled.value = true
-  await props.downloadSearchBarRef.searchByKeyword(props.downloadSearchBarRef.searchByKeywordInput, pageNumber)
-  paginationDisabled.value = false
+  paginationDisabled.value = true;
+  await props.downloadSearchBarRef.searchByKeyword(props.downloadSearchBarRef.searchByKeywordInput, pageNumber);
+  paginationDisabled.value = false;
 }
 
 </script>

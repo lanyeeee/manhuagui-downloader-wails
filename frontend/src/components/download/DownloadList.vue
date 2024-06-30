@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {defineProps, ref} from "vue"
+import {defineProps, ref} from "vue";
 import {TreeInst, TreeOption} from "naive-ui";
 import DownloadProgress from "./DownloadProgress.vue";
 import DownloadButton from "./DownloadButton.vue";
@@ -8,21 +8,21 @@ import {useDownloaderStore} from "../../stores/downloader";
 import CacheDirectoryInput from "../settings/CacheDirectoryInput.vue";
 
 
-const store = useDownloaderStore()
+const store = useDownloaderStore();
 
 const props = defineProps<{
   downloadTreeInst: TreeInst | null,
   downloadTreeOptions: TreeOption[],
   optionsToDownload: (TreeOption | null)[],
   optionsDownloading: (TreeOption | null)[],
-}>()
+}>();
 
-const downloadProgressRefs = ref<(InstanceType<typeof DownloadProgress>)[]>([])
+const downloadProgressRefs = ref<(InstanceType<typeof DownloadProgress>)[]>([]);
 
-const searchDisabled = defineModel<boolean>("searchDisabled", {required: true})
+const searchDisabled = defineModel<boolean>("searchDisabled", {required: true});
 
 async function onOpenCacheDirectory() {
-  BrowserOpenURL(store.cacheDirectory)
+  BrowserOpenURL(store.cacheDirectory);
 }
 
 </script>

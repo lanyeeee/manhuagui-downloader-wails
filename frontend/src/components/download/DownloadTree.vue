@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import {NTree, TreeInst, TreeOption, TreeOverrideNodeClickBehavior} from "naive-ui"
-import {defineModel} from "vue"
+import {NTree, TreeInst, TreeOption, TreeOverrideNodeClickBehavior} from "naive-ui";
+import {defineModel} from "vue";
 
 const downloadTreeInst = defineModel<TreeInst | null>("downloadTreeInst", {required: true});
 const downloadTreeOptions = defineModel<TreeOption[]>("downloadTreeOptions", {required: true});
@@ -9,10 +9,10 @@ const downloadDefaultCheckedKeys = defineModel<string[]>("downloadDefaultChecked
 
 const treeNodeClickBehaviour: TreeOverrideNodeClickBehavior = ({option}) => {
   if (option.children?.length === 0) {
-    return "toggleCheck"
+    return "toggleCheck";
   }
-  return "toggleExpand"
-}
+  return "toggleExpand";
+};
 
 
 </script>

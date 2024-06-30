@@ -1,8 +1,8 @@
-import {defineStore} from "pinia"
+import {defineStore} from "pinia";
 import * as path from "../../wailsjs/go/api/PathApi";
 import {GetCpuNum, GetUserDownloadPath, GetUserProxy} from "../../wailsjs/go/api/UtilsApi";
 
-export const useDownloaderStore = defineStore('downloader', {
+export const useDownloaderStore = defineStore("downloader", {
     state: () => ({
         proxyUrl: "",
         downloadConcurrentCount: 3,
@@ -16,24 +16,24 @@ export const useDownloaderStore = defineStore('downloader', {
     actions: {
         async init() {
             try {
-                this.proxyUrl = await GetUserProxy()
+                this.proxyUrl = await GetUserProxy();
 
-                const userDownloadPath = await GetUserDownloadPath()
-                const exportDirectory = await path.Join([userDownloadPath, "漫画导出"])
+                const userDownloadPath = await GetUserDownloadPath();
+                const exportDirectory = await path.Join([userDownloadPath, "漫画导出"]);
                 if (!await path.PathExists(exportDirectory)) {
-                    await path.MkDirAll(exportDirectory)
+                    await path.MkDirAll(exportDirectory);
                 }
-                const cacheDirectory = await path.Join([userDownloadPath, "漫画缓存"])
+                const cacheDirectory = await path.Join([userDownloadPath, "漫画缓存"]);
                 if (!await path.PathExists(cacheDirectory)) {
-                    await path.MkDirAll(cacheDirectory)
+                    await path.MkDirAll(cacheDirectory);
                 }
-                this.exportDirectory = await path.Join([userDownloadPath, "漫画导出"])
-                this.cacheDirectory = await path.Join([userDownloadPath, "漫画缓存"])
+                this.exportDirectory = await path.Join([userDownloadPath, "漫画导出"]);
+                this.cacheDirectory = await path.Join([userDownloadPath, "漫画缓存"]);
 
-                this.exportConcurrentCount = await GetCpuNum() / 2
+                this.exportConcurrentCount = await GetCpuNum() / 2;
             } catch (e) {
-                console.error(e)
+                console.error(e);
             }
         },
     },
-})
+});
