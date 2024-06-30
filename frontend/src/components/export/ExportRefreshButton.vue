@@ -7,19 +7,19 @@ import {ScanCacheDir} from "../../../wailsjs/go/api/ExportApi";
 import {TreeOption, useNotification} from "naive-ui";
 import {ExportStatus} from "../../constants/export-constant";
 
-const notification = useNotification()
-const store = useDownloaderStore()
+const notification = useNotification();
+const store = useDownloaderStore();
 
 const props = defineProps<{
   refreshDisabled: boolean,
-}>()
+}>();
 
 const exportTreeOptions = defineModel<TreeOption[]>("exportTreeOptions", {required: true});
 const exportDefaultExpandKeys = defineModel<string[]>("exportDefaultExpandKeys", {required: true});
 const exportDefaultCheckedKeys = defineModel<string[]>("exportDefaultCheckedKeys", {required: true});
 
-const loading = ref<boolean>(false)
-watch(() => store.cacheDirectory, onRefresh)
+const loading = ref<boolean>(false);
+watch(() => store.cacheDirectory, onRefresh);
 
 
 async function buildOptionTree(node: types.TreeNode) {
@@ -29,55 +29,55 @@ async function buildOptionTree(node: types.TreeNode) {
     isLeaf: node.isLeaf,
     disabled: node.disabled,
     children: []
-  }
+  };
   if (node.defaultChecked) {
-    exportDefaultCheckedKeys.value.push(node.key)
-    nodeOption.suffix = () => ExportStatus.COMPLETED
+    exportDefaultCheckedKeys.value.push(node.key);
+    nodeOption.suffix = () => ExportStatus.COMPLETED;
   }
   if (node.defaultExpand) {
-    exportDefaultExpandKeys.value.push(node.key)
+    exportDefaultExpandKeys.value.push(node.key);
   }
 
   for (const child of node.children) {
-    const childOption = await buildOptionTree(child)
+    const childOption = await buildOptionTree(child);
     nodeOption.children?.push(childOption);
   }
 
-  return nodeOption
+  return nodeOption;
 }
 
 async function onRefresh() {
   try {
-    loading.value = true
+    loading.value = true;
 
-    const response = await ScanCacheDir(store.cacheDirectory, store.exportDirectory, store.exportTreeMaxDepth)
+    const response = await ScanCacheDir(store.cacheDirectory, store.exportDirectory, store.exportTreeMaxDepth);
     if (response.code != 0) {
-      notification.create({type: "error", title: "扫描缓存目录失败", content: response.msg})
-      return
+      notification.create({type: "error", title: "扫描缓存目录失败", content: response.msg});
+      return;
     }
 
-    const roots: types.TreeNode[] = response.data
+    const roots: types.TreeNode[] = response.data;
     // 清空原有的数据
-    const options: TreeOption[] = []
-    exportDefaultCheckedKeys.value.length = 0
-    exportDefaultExpandKeys.value.length = 0
+    const options: TreeOption[] = [];
+    exportDefaultCheckedKeys.value.length = 0;
+    exportDefaultExpandKeys.value.length = 0;
     for (const root of roots) {
-      const rootOption = await buildOptionTree(root)
-      options.push(rootOption)
+      const rootOption = await buildOptionTree(root);
+      options.push(rootOption);
     }
 
-    exportTreeOptions.value = options
+    exportTreeOptions.value = options;
   } catch (e) {
-    console.error(e)
+    console.error(e);
     if (typeof e === "string") {
-      notification.create({type: "error", title: "扫描缓存目录失败", content: "异常", meta: e})
+      notification.create({type: "error", title: "扫描缓存目录失败", content: "异常", meta: e});
     } else if (e instanceof Error) {
-      notification.create({type: "error", title: "扫描缓存目录失败", content: "异常", meta: e.message})
+      notification.create({type: "error", title: "扫描缓存目录失败", content: "异常", meta: e.message});
     } else {
-      notification.create({type: "error", title: "扫描缓存目录失败", content: "异常", meta: "未知异常"})
+      notification.create({type: "error", title: "扫描缓存目录失败", content: "异常", meta: "未知异常"});
     }
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 
 }

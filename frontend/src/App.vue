@@ -1,14 +1,14 @@
 <script lang="ts" setup>
-import {useDownloaderStore} from "./stores/downloader"
-import {onMounted} from "vue"
+import {useDownloaderStore} from "./stores/downloader";
+import {onMounted} from "vue";
 import DownloadPane from "./components/download/DownloadPane.vue";
 import ExportPane from "./components/export/ExportPane.vue";
 import SettingsPane from "./components/settings/SettingsPane.vue";
 
-const store = useDownloaderStore()
+const store = useDownloaderStore();
 onMounted(async () => {
-  await store.init()
-})
+  await store.init();
+});
 
 </script>
 

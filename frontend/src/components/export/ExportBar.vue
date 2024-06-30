@@ -1,31 +1,31 @@
 <script setup lang="ts">
 
-import {NButton, NSpin, TreeInst, TreeOption, useNotification} from "naive-ui"
-import {defineProps, h, ref} from "vue"
-import {useDownloaderStore} from "../../stores/downloader"
-import {BookOutline as ExportIcon} from "@vicons/ionicons5"
-import {ExportStatus} from "../../constants/export-constant"
-import {export_pdf} from "../../../wailsjs/go/models"
-import {BrowserOpenURL, EventsOff, EventsOn} from "../../../wailsjs/runtime"
-import * as path from "../../../wailsjs/go/api/PathApi"
-import {CreatePdfs, MergePdfs} from "../../../wailsjs/go/api/ExportApi"
+import {NButton, NSpin, TreeInst, TreeOption, useNotification} from "naive-ui";
+import {defineProps, h, ref} from "vue";
+import {useDownloaderStore} from "../../stores/downloader";
+import {BookOutline as ExportIcon} from "@vicons/ionicons5";
+import {ExportStatus} from "../../constants/export-constant";
+import {export_pdf} from "../../../wailsjs/go/models";
+import {BrowserOpenURL, EventsOff, EventsOn} from "../../../wailsjs/runtime";
+import * as path from "../../../wailsjs/go/api/PathApi";
+import {CreatePdfs, MergePdfs} from "../../../wailsjs/go/api/ExportApi";
 import ExportDirectoryInput from "../settings/ExportDirectoryInput.vue";
 
-const store = useDownloaderStore()
-const notification = useNotification()
+const store = useDownloaderStore();
+const notification = useNotification();
 
 const props = defineProps<{
   exportTreeInst: TreeInst | null,
   exportTreeOptions: TreeOption[],
-}>()
+}>();
 
-const refreshDisabled = defineModel<boolean>("refreshDisabled", {required: true})
+const refreshDisabled = defineModel<boolean>("refreshDisabled", {required: true});
 
-const buttonLoading = ref<boolean>(false)
-const createProgressIndicator = ref<string>("")
-const createProgressPercentage = ref<number>(0)
-const mergeProgressIndicator = ref<string>("")
-const mergeProgressPercentage = ref<number>(0)
+const buttonLoading = ref<boolean>(false);
+const createProgressIndicator = ref<string>("");
+const createProgressPercentage = ref<number>(0);
+const mergeProgressIndicator = ref<string>("");
+const mergeProgressPercentage = ref<number>(0);
 
 
 async function onExport() {
@@ -34,7 +34,7 @@ async function onExport() {
           option !== null &&
           !option.disabled &&
           option.isLeaf
-      ) as TreeOption[] ?? []
+      ) as TreeOption[] ?? [];
 
   const nonLeafOptionsToExport = (props.exportTreeInst?.getCheckedData().options
       .filter(option =>
@@ -44,43 +44,43 @@ async function onExport() {
       ) as TreeOption[] ?? [])
       .sort((a: TreeOption, b: TreeOption) => {
         // 按照路径深度排序，深度深的排在前面
-        const aSlashCount = (a.key as string).split("/").length
-        const bSlashCount = (b.key as string).split("/").length
-        return bSlashCount - aSlashCount
-      })
+        const aSlashCount = (a.key as string).split("/").length;
+        const bSlashCount = (b.key as string).split("/").length;
+        return bSlashCount - aSlashCount;
+      });
 
   // 如果leafOptionsToExport和nonLeafOptionsToExport都为空，报错
   if (leafOptionsToExport.length === 0 && nonLeafOptionsToExport.length === 0) {
-    notification.create({type: "error", title: "导出失败", content: "请选择要导出的章节", duration: 2000,})
-    return
+    notification.create({type: "error", title: "导出失败", content: "请选择要导出的章节", duration: 2000,});
+    return;
   }
 
   try {
-    buttonLoading.value = true
-    refreshDisabled.value = true
-    createProgressPercentage.value = 0
-    createProgressIndicator.value = `(${0}/${leafOptionsToExport.length})`
-    mergeProgressPercentage.value = 0
-    mergeProgressIndicator.value = `(${0}/${nonLeafOptionsToExport.length})`
+    buttonLoading.value = true;
+    refreshDisabled.value = true;
+    createProgressPercentage.value = 0;
+    createProgressIndicator.value = `(${0}/${leafOptionsToExport.length})`;
+    mergeProgressPercentage.value = 0;
+    mergeProgressIndicator.value = `(${0}/${nonLeafOptionsToExport.length})`;
 
     // 先把所有的option都disable掉，防止用户在导出过程中进行其他操作
     leafOptionsToExport.forEach(option => {
-      option.disabled = true
-      option.suffix = () => ExportStatus.WAITING
-    })
+      option.disabled = true;
+      option.suffix = () => ExportStatus.WAITING;
+    });
     nonLeafOptionsToExport.forEach(option => {
-      option.disabled = true
-      option.suffix = () => ExportStatus.WAITING
-    })
+      option.disabled = true;
+      option.suffix = () => ExportStatus.WAITING;
+    });
 
-    const createSuccess = await exportLeafOptions(leafOptionsToExport)
+    const createSuccess = await exportLeafOptions(leafOptionsToExport);
     // 只有创建成功才会进行合并
     if (createSuccess) {
-      await exportNonLeafOptions(nonLeafOptionsToExport)
+      await exportNonLeafOptions(nonLeafOptionsToExport);
     }
   } finally {
-    buttonLoading.value = false
-    refreshDisabled.value = false
+    buttonLoading.value = false;
+    refreshDisabled.value = false;
   }
 }
 
@@ -88,78 +88,78 @@ async function exportLeafOptions(optionsToExport: TreeOption []): Promise<boolea
   const request = new export_pdf.CreatePdfsRequest({
     tasks: [],
     concurrentCount: store.exportConcurrentCount
-  })
+  });
 
   // 填充request的tasks，并且给每个option添加prefix和suffix
   for (const option of optionsToExport) {
-    option.prefix = () => h(NSpin, {size: 15})
-    option.suffix = () => ExportStatus.CREATING
+    option.prefix = () => h(NSpin, {size: 15});
+    option.suffix = () => ExportStatus.CREATING;
 
-    const imageDirectory = option.key as string
+    const imageDirectory = option.key as string;
     // 获取相对路径
-    const relativePath = await path.GetRelPath(store.cacheDirectory, imageDirectory)
-    const outputPath = await path.Join([store.exportDirectory, relativePath + ".pdf"])
+    const relativePath = await path.GetRelPath(store.cacheDirectory, imageDirectory);
+    const outputPath = await path.Join([store.exportDirectory, relativePath + ".pdf"]);
     const task: export_pdf.CreatePdfTask = {
       imgDir: option.key as string,
       outputPath: outputPath,
       optionKey: option.key as string,
-    }
-    request.tasks.push(task)
+    };
+    request.tasks.push(task);
   }
 
   try {
     EventsOn("create_pdf", (completedOptionKey: string, msg: string, percentage: number) => {
-      const completedOption = optionsToExport.find(option => option.key === completedOptionKey) as TreeOption | undefined
+      const completedOption = optionsToExport.find(option => option.key === completedOptionKey) as TreeOption | undefined;
       if (completedOption !== undefined) {
-        completedOption.suffix = () => ExportStatus.COMPLETED
-        completedOption.prefix = undefined
+        completedOption.suffix = () => ExportStatus.COMPLETED;
+        completedOption.prefix = undefined;
       }
-      createProgressIndicator.value = msg
-      createProgressPercentage.value = percentage
-    })
+      createProgressIndicator.value = msg;
+      createProgressPercentage.value = percentage;
+    });
 
-    const response = await CreatePdfs(request)
+    const response = await CreatePdfs(request);
     if (response.code != 0) {
-      notification.create({type: "error", title: "导出失败", content: "创建PDF文件失败", meta: response.msg,})
-      return false
+      notification.create({type: "error", title: "导出失败", content: "创建PDF文件失败", meta: response.msg,});
+      return false;
     }
 
-    return true
+    return true;
   } finally {
-    EventsOff("create_pdf")
+    EventsOff("create_pdf");
   }
 }
 
 async function exportNonLeafOptions(optionsToExport: TreeOption[]) {
   for (const [i, option] of optionsToExport.entries()) {
     try {
-      option.prefix = () => h(NSpin, {size: 15})
-      option.suffix = () => ExportStatus.MERGING
+      option.prefix = () => h(NSpin, {size: 15});
+      option.suffix = () => ExportStatus.MERGING;
 
-      const relativePath = await path.GetRelPath(store.cacheDirectory, option.key as string)
-      const inputDirectory = await path.Join([store.exportDirectory, relativePath])
-      const outputPath = await path.Join([store.exportDirectory, relativePath + ".pdf"])
+      const relativePath = await path.GetRelPath(store.cacheDirectory, option.key as string);
+      const inputDirectory = await path.Join([store.exportDirectory, relativePath]);
+      const outputPath = await path.Join([store.exportDirectory, relativePath + ".pdf"]);
 
-      const response = await MergePdfs(inputDirectory, outputPath)
+      const response = await MergePdfs(inputDirectory, outputPath);
       if (response.code != 0) {
-        notification.create({type: "error", title: "导出失败", content: "合并PDF文件失败", meta: response.msg,})
-        option.prefix = undefined
-        option.suffix = () => ExportStatus.FAILED
-        continue
+        notification.create({type: "error", title: "导出失败", content: "合并PDF文件失败", meta: response.msg,});
+        option.prefix = undefined;
+        option.suffix = () => ExportStatus.FAILED;
+        continue;
       }
 
-      option.prefix = undefined
-      option.suffix = () => ExportStatus.COMPLETED
+      option.prefix = undefined;
+      option.suffix = () => ExportStatus.COMPLETED;
     } finally {
-      option.disabled = false
-      mergeProgressPercentage.value = ((i + 1) / optionsToExport.length) * 100
-      mergeProgressIndicator.value = `(${i + 1}/${optionsToExport.length})`
+      option.disabled = false;
+      mergeProgressPercentage.value = ((i + 1) / optionsToExport.length) * 100;
+      mergeProgressIndicator.value = `(${i + 1}/${optionsToExport.length})`;
     }
   }
 }
 
 async function onOpenExportDirectory() {
-  BrowserOpenURL(store.exportDirectory)
+  BrowserOpenURL(store.exportDirectory);
 }
 
 </script>

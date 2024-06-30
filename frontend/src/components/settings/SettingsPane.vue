@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import {onMounted, ref} from "vue"
-import {useDownloaderStore} from "../../stores/downloader"
-import {GetCpuNum} from "../../../wailsjs/go/api/UtilsApi"
+import {onMounted, ref} from "vue";
+import {useDownloaderStore} from "../../stores/downloader";
+import {GetCpuNum} from "../../../wailsjs/go/api/UtilsApi";
 import CacheDirectoryInput from "./CacheDirectoryInput.vue";
 import ExportDirectoryInput from "./ExportDirectoryInput.vue";
 
-const store = useDownloaderStore()
+const store = useDownloaderStore();
 
-const maxExportConcurrentCount = ref<number>(0)
+const maxExportConcurrentCount = ref<number>(0);
 
 onMounted(async () => {
-  maxExportConcurrentCount.value = await GetCpuNum()
-})
+  maxExportConcurrentCount.value = await GetCpuNum();
+});
 
 //TODO: 优化设置界面
 </script>

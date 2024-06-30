@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import {NTree, TreeInst, TreeOption, TreeOverrideNodeClickBehavior} from "naive-ui"
-import {defineModel, ref, watch} from "vue"
+import {NTree, TreeInst, TreeOption, TreeOverrideNodeClickBehavior} from "naive-ui";
+import {defineModel, ref, watch} from "vue";
 
 
 const exportTreeInst = defineModel<TreeInst | null>("exportTreeInst", {required: true});
@@ -9,17 +9,17 @@ const exportDefaultExpandKeys = defineModel<string[]>("exportDefaultExpandKeys",
 const exportDefaultCheckedKeys = defineModel<string[]>("exportDefaultCheckedKeys", {required: true});
 
 
-const treeRef = ref<TreeInst | null>(null)
+const treeRef = ref<TreeInst | null>(null);
 watch(treeRef, () => {
-  exportTreeInst.value = treeRef.value
-})
+  exportTreeInst.value = treeRef.value;
+});
 
 const treeNodeClickBehaviour: TreeOverrideNodeClickBehavior = ({option}) => {
   if (option.children?.length === 0) {
-    return "toggleCheck"
+    return "toggleCheck";
   }
-  return "toggleExpand"
-}
+  return "toggleExpand";
+};
 
 </script>
 

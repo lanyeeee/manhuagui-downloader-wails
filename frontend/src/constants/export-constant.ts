@@ -4,4 +4,4 @@ export const ExportStatus = {
     MERGING: "🔄合并中",
     FAILED: "❌导出失败",
     WAITING: "⏳等待导出",
-}
+};

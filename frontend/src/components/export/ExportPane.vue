@@ -4,16 +4,16 @@ import ExportBar from "./ExportBar.vue";
 import ExportRefreshButton from "./ExportRefreshButton.vue";
 import CacheDirectoryInput from "../settings/CacheDirectoryInput.vue";
 import {TreeInst, TreeOption} from "naive-ui";
-import {computed, ref} from "vue"
+import {computed, ref} from "vue";
 
 
-const exportTreeInst = ref<TreeInst | null>(null)
-const exportTreeOptions = ref<TreeOption[]>([])
-const exportDefaultExpandKeys = ref<string[]>([])
-const exportDefaultCheckedKeys = ref<string[]>([])
-const refreshDisabled = ref<boolean>(false)
+const exportTreeInst = ref<TreeInst | null>(null);
+const exportTreeOptions = ref<TreeOption[]>([]);
+const exportDefaultExpandKeys = ref<string[]>([]);
+const exportDefaultCheckedKeys = ref<string[]>([]);
+const refreshDisabled = ref<boolean>(false);
 
-const showExportTree = computed<boolean>(() => exportTreeOptions.value.length !== 0)
+const showExportTree = computed<boolean>(() => exportTreeOptions.value.length !== 0);
 
 </script>
 
