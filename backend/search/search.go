@@ -199,8 +199,13 @@ func getCurrentPageAndTotalPage(doc *goquery.Document) (int, int, error) {
 	if totalResult == 0 {
 		return 0, 0, nil
 	}
-	// 找到当前页
-	currentPage, err := strconv.Atoi(doc.Find("span.current").Text())
+
+	currentPageString := doc.Find("span.current").Text()
+	// 如果只有一页
+	if currentPageString == "" {
+		return 1, 1, nil
+	}
+	currentPage, err := strconv.Atoi(currentPageString)
 	if err != nil {
 		return 0, 0, fmt.Errorf("convert current page failed: %w", err)
 	}
@@ -286,6 +291,9 @@ func buildTree(comicInfo *ComicInfo, cacheDir string) (types.TreeNode, error) {
 			DefaultExpand: true,
 		}
 
+		// FIXME: 连载中的漫画更新后，pageTitle会发生变化
+		// 例如本来pageTitle为(1-88, 89-178)的漫画，更新179话后，pageTitle变为(1-89, 90-179)，这会导致之前下载的章节被重复下载
+		// 目前没有想到太好的解决方案
 		for _, chapterPage := range chapterType.ChapterPages {
 			chapterPageNode := types.TreeNode{
 				Label:    chapterPage.Title,
