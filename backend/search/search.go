@@ -2,7 +2,6 @@ package search
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	lzstring "github.com/daku10/go-lz-string"
@@ -66,19 +65,19 @@ func ComicByComicId(comicId string, cacheDir string) (types.TreeNode, error) {
 	if err != nil {
 		return types.TreeNode{}, fmt.Errorf("do request failed: %w", err)
 	}
-	defer func(Body io.ReadCloser) { _ = Body.Close() }(resp.Body)
-	respBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return types.TreeNode{}, fmt.Errorf("read response body failed: %w", err)
-	}
 	// 处理HTTP错误
 	switch resp.StatusCode {
 	case http.StatusOK:
 		// ignore
 	case http.StatusNotFound:
-		return types.TreeNode{}, errors.New(fmt.Sprintf("can't find comic with id: %s", comicId))
+		return types.TreeNode{}, fmt.Errorf("can't find comic with id: %s", comicId)
 	default:
-		return types.TreeNode{}, errors.New(fmt.Sprintf("unexpected status code: %d", resp.StatusCode))
+		return types.TreeNode{}, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+	}
+	defer func(Body io.ReadCloser) { _ = Body.Close() }(resp.Body)
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return types.TreeNode{}, fmt.Errorf("read response body failed: %w", err)
 	}
 
 	htmlContent := string(respBody)
@@ -97,7 +96,7 @@ func ComicByComicId(comicId string, cacheDir string) (types.TreeNode, error) {
 		// 获取id为__VIEWSTATE的input标签的value属性
 		val, exists := doc.Find("input[id=__VIEWSTATE]").First().Attr("value")
 		if !exists {
-			return types.TreeNode{}, errors.New("can't find __VIEWSTATE")
+			return types.TreeNode{}, fmt.Errorf("can't find __VIEWSTATE")
 		}
 		// 解码得到隐藏的html内容
 		hiddenContent, err := lzstring.DecompressFromBase64(val)
@@ -135,6 +134,9 @@ func ComicByKeyword(keyword string, pageNum int) (ComicSearchResult, error) {
 	resp, err := http_client.HttpClientInst().Get(searchUrl)
 	if err != nil {
 		return ComicSearchResult{}, fmt.Errorf("do request failed: %w", err)
+	}
+	if resp.StatusCode != http.StatusOK {
+		return ComicSearchResult{}, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 	defer func(Body io.ReadCloser) { _ = Body.Close() }(resp.Body)
 	respBody, err := io.ReadAll(resp.Body)

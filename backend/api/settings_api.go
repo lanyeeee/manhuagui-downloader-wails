@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"manhuagui-downloader/backend/types"
 	"manhuagui-downloader/backend/utils"
@@ -35,7 +36,7 @@ func (s *SettingsApi) ChooseDirectory(dirPath string) types.Response {
 	chosenDir, err := runtime.OpenDirectoryDialog(s.ctx, option)
 	if err != nil {
 		resp.Code = -1
-		resp.Msg = err.Error()
+		resp.Msg = fmt.Sprintf("ChooseDirectory: %s", err.Error())
 		return resp
 	}
 

@@ -45,7 +45,9 @@ func Decode(htmlContent *string) (DecodeResult, error) {
 func decodeHtmlContent(htmlContent *string) (string, int, int, []string, error) {
 	re := regexp.MustCompile(`^.*}\('(.*)',(\d*),(\d*),'([\w|+/=]*)'.*$`)
 	matches := re.FindStringSubmatch(*htmlContent)
-
+	if len(matches) != 5 {
+		return "", 0, 0, nil, fmt.Errorf("invalid html content: %s", *htmlContent)
+	}
 	function := matches[1]
 
 	a, err := strconv.Atoi(matches[2])
