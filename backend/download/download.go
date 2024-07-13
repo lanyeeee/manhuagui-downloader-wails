@@ -37,6 +37,7 @@ func ComicChapter(ctx context.Context, chapterUrl string, saveDir string, concur
 	// 解析章节页面，获取图片列表
 	decodeResult, err := requestDecodeResult(chapterUrl)
 	if err != nil {
+		// TODO: 处理EOF错误(IP被封)
 		return fmt.Errorf("request decode result failed: %w", err)
 	}
 	// 没有图片就直接返回
@@ -126,6 +127,7 @@ func downloadImage(ctx context.Context, imgUrl string, dstPath string, downloadR
 		if err == nil {
 			break
 		}
+		// TODO: 处理EOF错误(IP被封)
 		// 下载失败则等待1秒后重试
 		time.Sleep(1 * time.Second)
 	}
@@ -133,6 +135,11 @@ func downloadImage(ctx context.Context, imgUrl string, dstPath string, downloadR
 	if err != nil {
 		fmt.Printf("下载图片 %s 失败，错误信息：\n%s\n", imgUrl, err)
 		downloadResultCh <- downloadResult{imgData: nil, err: fmt.Errorf("download image failed: %w", err)}
+		return
+	}
+	// 下载失败
+	if imgData == nil {
+		downloadResultCh <- downloadResult{imgData: nil, err: fmt.Errorf("download image failed: imgData is nil")}
 		return
 	}
 	// 下载成功，保存图片
@@ -156,6 +163,9 @@ func requestImageData(imgUrl string) (*[]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("do request failed: %w", err)
 	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+	}
 	defer func(Body io.ReadCloser) { _ = Body.Close() }(resp.Body)
 
 	respBody, err := io.ReadAll(resp.Body)
@@ -170,6 +180,9 @@ func requestDecodeResult(chapterUrl string) (decoder.DecodeResult, error) {
 	resp, err := http_client.HttpClientInst().Get(chapterUrl)
 	if err != nil {
 		return decoder.DecodeResult{}, fmt.Errorf("do request failed: %w", err)
+	}
+	if resp.StatusCode != http.StatusOK {
+		return decoder.DecodeResult{}, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 	defer func(Body io.ReadCloser) { _ = Body.Close() }(resp.Body)
 

@@ -1,7 +1,6 @@
 package export_pdf
 
 import (
-	"errors"
 	"fmt"
 	"github.com/pdfcpu/pdfcpu/pkg/api"
 	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu/types"
@@ -78,7 +77,7 @@ func createPdf(ctx context.Context, task *CreatePdfTask, pdfResultCh chan<- crea
 	}
 	// 如果没有图片文件，则返回错误
 	if len(imgEntries) == 0 {
-		err = errors.New(fmt.Sprintf("dir '%s' has no image files", task.ImgDir))
+		err = fmt.Errorf("dir '%s' has no image files", task.ImgDir)
 		pdfResultCh <- createPdfResult{"", err}
 		return
 	}

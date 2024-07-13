@@ -1,7 +1,6 @@
 package export_pdf
 
 import (
-	"errors"
 	"fmt"
 	"github.com/pdfcpu/pdfcpu/pkg/api"
 	"manhuagui-downloader/backend/utils"
@@ -19,7 +18,7 @@ func MergePdfs(pdfDir string, outputPath string) error {
 	}
 	// 如果目录下没有 PDF 文件，则返回错误
 	if len(pdfEntries) == 0 {
-		return errors.New(fmt.Sprintf("dir %s has no pdf files", pdfDir))
+		return fmt.Errorf("dir %s has no pdf files", pdfDir)
 	}
 	// 从 PDF 文件列表中提取 PDF 文件路径
 	pdfPaths := make([]string, len(pdfEntries))

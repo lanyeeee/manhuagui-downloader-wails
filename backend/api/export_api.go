@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"manhuagui-downloader/backend/export_pdf"
 	"manhuagui-downloader/backend/scan_cache"
 	"manhuagui-downloader/backend/types"
@@ -24,7 +25,7 @@ func (e *ExportApi) ScanCacheDir(cacheDir string, exportDir string, maxDepth int
 	treeOption, err := scan_cache.ScanCacheDir(cacheDir, exportDir, maxDepth)
 	if err != nil {
 		resp.Code = -1
-		resp.Msg = err.Error()
+		resp.Msg = fmt.Sprintf("ScanCacheDir: %s", err.Error())
 		return resp
 	}
 
@@ -38,7 +39,7 @@ func (e *ExportApi) CreatePdfs(request export_pdf.CreatePdfsRequest) types.Respo
 
 	if err != nil {
 		resp.Code = -1
-		resp.Msg = err.Error()
+		resp.Msg = fmt.Sprintf("CreatePdfs: %s", err.Error())
 	}
 
 	return resp
@@ -50,7 +51,7 @@ func (e *ExportApi) MergePdfs(pdfDir string, outputPath string) types.Response {
 
 	if err != nil {
 		resp.Code = -1
-		resp.Msg = err.Error()
+		resp.Msg = fmt.Sprintf("MergePdfs: %s", err.Error())
 	}
 
 	return resp

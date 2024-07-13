@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"manhuagui-downloader/backend/download"
 	"manhuagui-downloader/backend/http_client"
 	"manhuagui-downloader/backend/search"
@@ -26,14 +27,14 @@ func (d *DownloadApi) SearchComicById(comicId string, proxyUrl string, cacheDir 
 	err := http_client.UpdateProxy(proxyUrl)
 	if err != nil {
 		resp.Code = -1
-		resp.Msg = err.Error()
+		resp.Msg = fmt.Sprintf("SearchComicById: %s", err.Error())
 		return resp
 	}
 
 	comicInfo, err := search.ComicByComicId(comicId, cacheDir)
 	if err != nil {
 		resp.Code = -1
-		resp.Msg = err.Error()
+		resp.Msg = fmt.Sprintf("SearchComicById: %s", err.Error())
 		return resp
 	}
 
@@ -47,14 +48,14 @@ func (d *DownloadApi) SearchComicByKeyword(keyword string, pageNum int, proxyUrl
 	err := http_client.UpdateProxy(proxyUrl)
 	if err != nil {
 		resp.Code = -1
-		resp.Msg = err.Error()
+		resp.Msg = fmt.Sprintf("SearchComicByKeyword: %s", err.Error())
 		return resp
 	}
 
 	result, err := search.ComicByKeyword(keyword, pageNum)
 	if err != nil {
 		resp.Code = -1
-		resp.Msg = err.Error()
+		resp.Msg = fmt.Sprintf("SearchComicByKeyword: %s", err.Error())
 		return resp
 	}
 
@@ -67,14 +68,14 @@ func (d *DownloadApi) DownloadChapter(chapterUrl string, saveDir string, concurr
 	err := http_client.UpdateProxy(proxyUrl)
 	if err != nil {
 		resp.Code = -1
-		resp.Msg = err.Error()
+		resp.Msg = fmt.Sprintf("DownloadChapter: %s", err.Error())
 		return resp
 	}
 
 	err = download.ComicChapter(d.ctx, chapterUrl, saveDir, concurrentCount)
 	if err != nil {
 		resp.Code = -1
-		resp.Msg = err.Error()
+		resp.Msg = fmt.Sprintf("DownloadChapter: %s", err.Error())
 		return resp
 	}
 
