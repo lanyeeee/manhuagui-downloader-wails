@@ -34,10 +34,31 @@ func ComicChapter(ctx context.Context, chapterUrl string, saveDir string, concur
 	if err := os.MkdirAll(tempDir, 0777); err != nil {
 		return fmt.Errorf("create temp dir failed: %w", err)
 	}
-	// 解析章节页面，获取图片列表
-	decodeResult, err := requestDecodeResult(chapterUrl)
+
+	// 最多重试3次
+	const MaxRetry = 3
+	var decodeResult decoder.DecodeResult
+	var err error
+	// 带重试下载图片
+	for i := 0; i < MaxRetry; i++ {
+		// 解析章节页面，获取图片列表
+		decodeResult, err = requestDecodeResult(chapterUrl)
+		if err == nil {
+			break
+		}
+		// 如果是EOF错误，说明IP被ban，等待1分钟后重试
+		if strings.HasSuffix(err.Error(), "EOF") {
+			for secs := 60; secs > 0; secs-- {
+				runtime.EventsEmit(ctx, "download", "IP被ban，将在"+strconv.Itoa(secs)+"秒后重试", 0)
+				time.Sleep(1 * time.Second)
+			}
+		} else {
+			// 其他错误
+			runtime.EventsEmit(ctx, "download", "解析章节页面失败，将在1秒后重试", 0)
+			time.Sleep(1 * time.Second)
+		}
+	}
 	if err != nil {
-		// TODO: 处理EOF错误(IP被封)
 		return fmt.Errorf("request decode result failed: %w", err)
 	}
 	// 没有图片就直接返回
@@ -127,9 +148,17 @@ func downloadImage(ctx context.Context, imgUrl string, dstPath string, downloadR
 		if err == nil {
 			break
 		}
-		// TODO: 处理EOF错误(IP被封)
-		// 下载失败则等待1秒后重试
-		time.Sleep(1 * time.Second)
+		// 如果是EOF错误，说明IP被ban，等待1分钟后重试
+		if strings.HasSuffix(err.Error(), "EOF") {
+			for secs := 60; secs > 0; secs-- {
+				runtime.EventsEmit(ctx, "download", "IP被ban，将在"+strconv.Itoa(secs)+"秒后重试", 0)
+				time.Sleep(1 * time.Second)
+			}
+		} else {
+			// 其他错误，等待1秒后重试
+			runtime.EventsEmit(ctx, "download", "下载图片失败，将在1秒后重试", 0)
+			time.Sleep(1 * time.Second)
+		}
 	}
 	// 下载失败
 	if err != nil {

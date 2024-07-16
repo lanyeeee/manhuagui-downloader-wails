@@ -9,7 +9,7 @@ export const useDownloaderStore = defineStore("downloader", {
         exportConcurrentCount: 1,
         cacheDirectory: "",
         exportDirectory: "",
-        downloadInterval: 10,
+        downloadInterval: 0,
         exportTreeMaxDepth: 3,
     }),
     getters: {},
