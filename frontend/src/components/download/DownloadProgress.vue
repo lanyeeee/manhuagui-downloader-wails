@@ -57,7 +57,7 @@ async function download() {
 async function wait() {
   for (let i = 0; i < store.downloadInterval; i++) {
     await new Promise(resolve => setTimeout(resolve, 1000));
-    chapterProgressIndicator.value = `将在${store.downloadInterval - i}秒后继续下载(防止被ban IP)`;
+    chapterProgressIndicator.value = `将在${store.downloadInterval - i}秒后继续下载`;
   }
 
 }
