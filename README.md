@@ -1,8 +1,8 @@
 # manhuagui-downloader 漫画柜下载器
 
-<div style="text-align: center;">
+<p align="center">
     <img src="build/appicon.png" width="200" style="align-self: center"/>
-</div>
+</p>
 
 一个用于 manhuagui.com 看漫画 漫画柜 的下载器
 
