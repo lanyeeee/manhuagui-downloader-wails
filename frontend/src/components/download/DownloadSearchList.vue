@@ -30,7 +30,6 @@ async function onPageChange(pageNumber: number) {
 }
 
 </script>
-
 <template>
   <div>
     <n-scrollbar>
@@ -50,8 +49,14 @@ async function onPageChange(pageNumber: number) {
                   show-quick-jumper
     >
       <template #goto>
-        跳转至
+        跳至
       </template>
     </n-pagination>
   </div>
 </template>
+
+<style scoped>
+:deep(.n-button__content) {
+  @apply inline-block overflow-hidden text-ellipsis;
+}
+</style>

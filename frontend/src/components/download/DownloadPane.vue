@@ -46,7 +46,7 @@ const optionDownloading = computed<(TreeOption | null)[]>(() => downloadTreeInst
 
 <template>
   <div class="flex h-full">
-    <div class="flex-1 flex flex-col p-2">
+    <div class="basis-1/2 flex flex-col p-2 overflow-auto">
       <download-search-bar :disabled="searchDisabled"
                            v-model:download-tree-options="downloadTreeOptions"
                            v-model:download-default-expand-keys="downloadDefaultExpandKeys"
@@ -69,7 +69,7 @@ const optionDownloading = computed<(TreeOption | null)[]>(() => downloadTreeInst
                             :download-search-bar-ref="downloadSearchBarRef"
       />
     </div>
-    <div class="flex-1">
+    <div class="basis-1/2">
       <download-list :download-tree-inst="downloadTreeInst"
                      :download-tree-options="downloadTreeOptions"
                      :options-to-download="optionToDownload"
