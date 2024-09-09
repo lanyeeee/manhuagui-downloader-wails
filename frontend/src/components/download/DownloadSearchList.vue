@@ -47,6 +47,7 @@ async function onPageChange(pageNumber: number) {
                   :disabled=paginationDisabled
                   @update:page="onPageChange"
                   show-quick-jumper
+                  :page-slot="8"
     >
       <template #goto>
         跳至
