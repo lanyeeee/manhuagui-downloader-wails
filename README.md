@@ -1,3 +1,10 @@
+> # ⚠️ 重要通知
+> 
+> **本项目已完成重写，并迁移至新仓库：[manhuagui-downloader](https://github.com/lanyeeee/manhuagui-downloader)**
+> 
+> 这个仓库将不再维护，新版本提供了更好的用户体验，建议所有用户迁移到新版本
+
+
 # 漫画柜下载器
 
 <p align="center">
