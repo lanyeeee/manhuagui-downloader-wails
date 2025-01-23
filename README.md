@@ -1,4 +1,4 @@
-# manhuagui-downloader 漫画柜下载器
+# 漫画柜下载器
 
 <p align="center">
     <img src="build/appicon.png" width="200" style="align-self: center"/>
@@ -6,7 +6,7 @@
 
 一个用于 manhuagui.com 看漫画 漫画柜 的下载器，带图形界面，支持下载隐藏内容、导出PDF，免安装版(portable)解压后可以直接运行。
 
-在[Release页面](https://github.com/lanyeeee/manhuagui-downloader/releases)可以直接下载
+在[Release页面](https://github.com/lanyeeee/manhuagui-downloader-wails/releases)可以直接下载
 
 **如果本项目对你有帮助，欢迎点个 Star⭐ 支持！你的支持是我持续更新维护的动力🙏**
 
@@ -37,7 +37,7 @@
 这个问题几乎是无解的(~~需要数字证书给软件签名，甚至给杀毒软件交保护费~~)  
 我能想到的解决办法只有：
 1. 根据下面的**如何构建(build)**，自行编译
-2. 希望你相信我的承诺，我承诺你在[Release页面](https://github.com/lanyeeee/manhuagui-downloader/releases)下载到的所有东西都是安全的
+2. 希望你相信我的承诺，我承诺你在[Release页面](https://github.com/lanyeeee/manhuagui-downloader-wails/releases)下载到的所有东西都是安全的
 
 # 如何构建(build)
 
@@ -60,13 +60,13 @@ go install github.com/wailsapp/wails/v2/cmd/wails@latest
 #### 2. 克隆本仓库
 
 ```
-git clone https://github.com/lanyeeee/manhuagui-downloader.git
+git clone https://github.com/lanyeeee/manhuagui-downloader-wails.git
 ```
 
 #### 3. 构建(build)
 
 ```
-cd manhuagui-downloader
+cd manhuagui-downloader-wails
 wails build
 ```
 # 其他
